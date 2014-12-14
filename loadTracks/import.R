@@ -186,5 +186,7 @@ parseLinkHeaderParam <- function(headerParam){
 #' @return list containing the parsed trackIDs
 #'
 parseTrackIDs<-function(jsonBody){
-  sapply(fromJSON(jsonBody)$tracks,function(x) return(x$id))
+  #sapply(fromJSON(jsonBody)$tracks,function(x) return(x$id))
+  sapply(fromJSON(jsonBody)$tracks,function(x) return(x["id"]))
+  #sapply(fromJSON(jsonBody)["tracks"],function(x) return(x["id"]))
 }
