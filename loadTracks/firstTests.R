@@ -45,7 +45,20 @@ ur = c(7.65,52) # upper right: 51.985515, 7.674909
 boundingbox = matrix(c(ll, ur),ncol=2,dimnames=list(c("x","y"),c("min","max")))
 boundingbox
 
+# disable timeouts
+setInternet2(use=NA)
+setInternet2(use=FALSE)
+setInternet2(use=NA)
+
 queryBoundingBox = importEnviroCar(serverUrl=stableURL, bbox=boundingbox)
 
+# get trackIDs from bbox
 trIds = getTrackIDs(serverUrl=stableURL, bbox=boundingbox)
 trIds
+
+# just get the first 5 IDs
+tr5 = trIds[1:5]
+
+
+trCol5 = importEnviroCar(serverUrl = stableURL, trackIDs = tr5)
+trCol5
