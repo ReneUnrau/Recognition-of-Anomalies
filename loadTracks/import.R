@@ -18,7 +18,7 @@ importEnviroCar = function(serverUrl, trackIDs, bbox, timeInterval) {
   # query track for each trackID
   if(length(trackIDs)==0)
     stop("No tracks available for the specified boundingbox and/or temporal filter.")
-  tracks = TracksCollection(lapply(trackIDs[["id"]],importSingleTrack,serverUrl=serverUrl))
+  tracks = TracksCollection(lapply(trackIDs,importSingleTrack,serverUrl=serverUrl))
   
   return(tracks)
 }
@@ -187,5 +187,6 @@ parseLinkHeaderParam <- function(headerParam){
 #'
 parseTrackIDs<-function(jsonBody){
   #sapply(fromJSON(jsonBody)$tracks,function(x) return(x$id))
-  sapply(fromJSON(jsonBody)$tracks,function(x) return(x["id"]))
+  #sapply(fromJSON(jsonBody)$tracks,function(x) return(x["id"]))
+  sapply(fromJSON(jsonBody)$tracks,function(x) return(x[["id"]]))
 }

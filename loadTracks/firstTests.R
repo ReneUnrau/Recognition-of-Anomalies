@@ -50,7 +50,7 @@ setInternet2(use=NA)
 setInternet2(use=FALSE)
 setInternet2(use=NA)
 
-queryBoundingBox = importEnviroCar(serverUrl=stableURL, bbox=boundingbox)
+#queryBoundingBox = importEnviroCar(serverUrl=stableURL, bbox=boundingbox) # loads all tracks from boundingbox
 
 # get trackIDs from bbox
 trIds = getTrackIDs(serverUrl=stableURL, bbox=boundingbox)
@@ -58,7 +58,10 @@ trIds
 
 # just get the first 5 IDs
 tr5 = trIds[1:5]
+tr5
 
-
-trCol5 = importEnviroCar(serverUrl = stableURL, trackIDs = tr5)
-trCol5
+trCol5 = importEnviroCar(serverUrl = stableURL, trackIDs = tr5) # track 1 and 2 seem to be identical
+plot(trCol5@tracksCollection$Tracks1@tracks$Track1@sp@coords, type="l", col="red")
+lines(trCol5@tracksCollection$Tracks3@tracks$Track1@sp@coords, type="l", col="blue")
+lines(trCol5@tracksCollection$Tracks4@tracks$Track1@sp@coords, type="l", col="green")
+lines(trCol5@tracksCollection$Tracks5@tracks$Track1@sp@coords, type="l", col="yellow")
