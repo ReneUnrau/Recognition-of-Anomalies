@@ -65,3 +65,6 @@ plot(trCol5@tracksCollection$Tracks1@tracks$Track1@sp@coords, type="l", col="red
 lines(trCol5@tracksCollection$Tracks3@tracks$Track1@sp@coords, type="l", col="blue")
 lines(trCol5@tracksCollection$Tracks4@tracks$Track1@sp@coords, type="l", col="green")
 lines(trCol5@tracksCollection$Tracks5@tracks$Track1@sp@coords, type="l", col="yellow")
+
+trIdsTestLimit = getTrackIDs(serverUrl=stableURL, bbox=boundingbox, limit=5, verbose=T)
+trIdsTestLimit

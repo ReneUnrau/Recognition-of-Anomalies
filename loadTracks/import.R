@@ -94,7 +94,7 @@ importSingleTrack <- function(serverUrl, trackID, verbose = FALSE){
 #' @return list containing the track IDs for the specified bbox and time interval, if these are present; otherwise all track IDs are returned
 #' 
 #' 
-getTrackIDs <- function(serverUrl, bbox, timeInterval, verbose = FALSE){
+getTrackIDs <- function(serverUrl, bbox, timeInterval, limit = 50, verbose = FALSE){
   
   trackUrl = paste(serverUrl,"/tracks",sep="")
   
@@ -114,6 +114,12 @@ getTrackIDs <- function(serverUrl, bbox, timeInterval, verbose = FALSE){
     trackUrl = paste(trackUrl,timeParam,sep="")
   }
   
+  #add limit parameter to URL, if not set the default parameter is used
+  if (!missing(limit)){
+    limitParam = paste("&limit=",limit,sep="")
+    trackUrl = paste(trackUrl,limitParam,sep="")
+  }
+  
   if (verbose) message(paste("Basic track url is ",trackUrl))
   
   #set header parameter to retrieve header; passing header function as in RCurl example doesn't work
@@ -124,38 +130,41 @@ getTrackIDs <- function(serverUrl, bbox, timeInterval, verbose = FALSE){
   headerString = headerAndBody[[1]][1]
   body = headerAndBody[[1]][2]
   
-  if(verbose) message(paste("Header is :",headerString))
-  
-  #######################
-  #check whether there are more than 100 entries (then paging is needed!)
-  header = parseHTTPHeader(headerString)
-  result = lapply(header,parseLinkHeaderParam)
-  result <- result[!sapply(result,is.null)] #remove null items
-  pagenumber=0
-  if (length(result)>0){
-    for (i in 1:length(result)){
-      if (grepl("last",result[i]$Link["relation"])){
-        pagenumber = as.numeric(result[i]$Link["pagenumber"])
-        if(verbose)message(paste("Number of pages for paging is ",pagenumber))
-      }
-    }
-  }
+  #if(verbose) message(paste("Header is :",headerString))
   
   ###################
-  ##parsing of actual track IDs, if paging is true (pagenumber>0), repeat parsing for each page
+  # Do not load more then 100 tracks!! Due to performance reasons!
+  ###################
+  #######################
+  #check whether there are more than 100 entries (then paging is needed!)
+  #header = parseHTTPHeader(headerString)
+  #result = lapply(header,parseLinkHeaderParam)
+  #result <- result[!sapply(result,is.null)] #remove null items
+  #pagenumber=0
+  #if (length(result)>0){
+  #  for (i in 1:length(result)){
+  #    if (grepl("last",result[i]$Link["relation"])){
+  #      pagenumber = as.numeric(result[i]$Link["pagenumber"])
+  #      if(verbose)message(paste("Number of pages for paging is ",pagenumber))
+  #    }
+  #  }
+  #}
+  
+  
+  #parsing of actual track IDs, if paging is true (pagenumber>0), repeat parsing for each page
   trackIDs = parseTrackIDs(body)
-  if(pagenumber>1){
-    for (i in 2:pagenumber){
-      if(verbose)message(paste("Iterating page ", i))
-      paramString = paste ("limits=100&page=",i,sep="")
-      if (missing(bbox)&&missing(timeInterval))requestUrl=paste(trackUrl,"?",paramString,sep="")
-      else requestUrl=paste(trackUrl,"&",paramString,sep="")
-      body = getURI(requestUrl,ssl.verifypeer=FALSE)
-      currentTracks = parseTrackIDs(body)
-      if(verbose)message(paste("Current number of tracks ", length(currentTracks)," for request url ",requestUrl))
-      trackIDs = c(trackIDs,currentTracks)
-    }
-  }
+  #if(pagenumber>1){
+  #  for (i in 2:pagenumber){
+  #    if(verbose)message(paste("Iterating page ", i))
+  #    paramString = paste ("limits=100&page=",i,sep="")
+  #    if (missing(bbox)&&missing(timeInterval))requestUrl=paste(trackUrl,"?",paramString,sep="")
+  #    else requestUrl=paste(trackUrl,"&",paramString,sep="")
+  #    body = getURI(requestUrl,ssl.verifypeer=FALSE)
+  #    currentTracks = parseTrackIDs(body)
+  #    if(verbose)message(paste("Current number of tracks ", length(currentTracks)," for request url ",requestUrl))
+  #    trackIDs = c(trackIDs,currentTracks)
+  #  }
+  #}
   return(trackIDs)
 }
 
