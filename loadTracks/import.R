@@ -8,11 +8,11 @@
 #' 
 #' 
 
-importEnviroCar = function(serverUrl, trackIDs, bbox, timeInterval) {
+importEnviroCar = function(serverUrl, trackIDs, bbox, timeInterval, limit = 50) {
   
   # query track IDs for bounding box and time interval; if trackIDs paramter is set, bbox and timeInterval are ignored
   if (missing(trackIDs)){
-    trackIDs = getTrackIDs(serverUrl,bbox,timeInterval)
+    trackIDs = getTrackIDs(serverUrl,bbox,timeInterval, limit)
   }
   
   # query track for each trackID
