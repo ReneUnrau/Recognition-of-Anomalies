@@ -25,6 +25,18 @@ shinyUI(fluidPage(
       fluidRow(column(10, verbatimTextOutput("selectedTracksList")))
     ),
     
-    mainPanel()
+    mainPanel(
+      leafletMap(
+        "map", "100%", 500,
+        # By default OpenStreetMap tiles are used; we want nothing in this case
+        #initialTileLayer = NULL,
+        #initialTileLayerAttribution = NULL,
+        options=list(
+          center = c(40, -98.85),
+          zoom = 4,
+          maxBounds = list(list(17, -180), list(59, 180))
+        )
+      )  
+    )
   )
 ))

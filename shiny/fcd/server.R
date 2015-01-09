@@ -1,8 +1,9 @@
 # server.R
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
-  
+  # create leaflet map
+  map <- createLeafletMap(session, "map")
   
   
   # output selected dates:
