@@ -1,6 +1,7 @@
 # ui (from tutorial)
 
 library(shiny)
+library(leaflet)
 
 currentTracksList = list("track1", "track2", "track3") # needs to be created from filter
 
@@ -22,7 +23,8 @@ shinyUI(fluidPage(
                   label = "Choose a Track to display",
                   choices = currentTracksList,
                   selected = currentTracksList[1]),
-      fluidRow(column(10, verbatimTextOutput("selectedTracksList")))
+      fluidRow(column(10, verbatimTextOutput("selectedTracksList"))),
+      htmlOutput("boundingBoxText")
     ),
     
     mainPanel(
