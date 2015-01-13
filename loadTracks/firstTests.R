@@ -66,5 +66,39 @@ lines(trCol5@tracksCollection$Tracks3@tracks$Track1@sp@coords, type="l", col="bl
 lines(trCol5@tracksCollection$Tracks4@tracks$Track1@sp@coords, type="l", col="green")
 lines(trCol5@tracksCollection$Tracks5@tracks$Track1@sp@coords, type="l", col="yellow")
 
+# get number of tracks in trackscollection
+length(trCol5@tracksCollection)
+
+
 trIdsTestLimit = getTrackIDs(serverUrl=stableURL, bbox=boundingbox, limit=5, verbose=T)
 trIdsTestLimit
+
+# test timeinterval
+start = as.POSIXct(x = "2015-01-01")
+end = as.POSIXct(x = "2015-01-12")
+time_interval = c(start, end)
+trIdsTestTimeLimit = getTrackIDs(serverUrl=stableURL, timeInterval = time_interval, limit=5, verbose=T)
+trIdsTestTimeLimit
+
+# get the tracknumber from a trackname (i.e. "track 1" -> 1)
+get_trackNumber = function(trackname){
+  trackname = toupper(trackname)
+  return(as.numeric(gsub("TRACK", "", trackname)))
+}
+
+# test function
+tr_num = get_trackNumber("Track2")
+
+# select a track from TracksCollection
+get_track = function(tracksCollection, tracknumber){
+  return(tracksCollection[tracknumber][1])
+}
+
+# test if tracks work
+tr1 = get_track(trCol5, 1)
+tr2 = get_track(trCol5, 2)
+plot(tr1@sp@coords, type="l", col="red")
+lines(tr2@sp@coords, type="l", col="blue")
+
+tr1@connections$speed[1]
+tr2@connections$speed[1]
