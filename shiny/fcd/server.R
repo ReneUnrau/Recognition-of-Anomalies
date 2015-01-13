@@ -25,6 +25,17 @@ create_timeinterval_from_input = function(start, end){
   return(c(start,end))
 }
 
+# get the tracknumber from a trackname (i.e. "track 1" -> 1)
+get_trackNumber = function(trackname){
+  trackname = toupper(trackname)
+  return(as.numeric(gsub("TRACK", "", trackname)))
+}
+
+# select a track from TracksCollection
+get_track = function(tracksCollection, tracknumber){
+  return(tracksCollection[tracknumber][1])
+}
+
 # create default trackcollection
 stableURL = "https://envirocar.org/api/stable"
 # create default bbox for Muenster
@@ -32,6 +43,9 @@ ll = c(7.6,51.95) # lower left : 51.928179, 7.573629
 ur = c(7.65,52) # upper right: 51.985515, 7.674909
 default_bbox = matrix(c(ll, ur),ncol=2,dimnames=list(c("x","y"),c("min","max")))
 trCol = importEnviroCar(serverUrl = stableURL, bbox = default_bbox, limit = 1)
+
+# get initial track
+currentTrack = get_track(trCol, 1)
 
 shinyServer(function(input, output, session) {
   
@@ -60,7 +74,7 @@ shinyServer(function(input, output, session) {
   # output the selected limit
   output$limit = renderPrint({ input$limit_slider })
   
-  # observe if button is clicked!
+  # change TracksCollection if search button is used
   observe({
     if (input$search_btn == 0) 
       return()
@@ -87,9 +101,21 @@ shinyServer(function(input, output, session) {
     })
   })
   
+  # change currentTrack if another track is chosen
+  observe({
+    if(is.null(input$tracksList))
+      return()
+    isolate({
+    print("observe currentTrack")
+    # get number from track selection
+    num = get_trackNumber(input$tracksList)
+    currentTrack <<- get_track(trCol, num)
+    })
+  })
+  
   # output the selected track name:
-  output$selectedTracksList = renderText({ 
-    paste("Selected Track: ", "\n", input$tracksList)
+  output$selectedTracksList = renderText({
+    paste("Selected Track: ", "\n", input$tracksList, "\n first speed: ", currentTrack@connections$speed[1])
   })
 
 })
