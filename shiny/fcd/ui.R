@@ -24,8 +24,7 @@ shinyUI(fluidPage(
       # start the search for tracks
       actionButton("search_btn", label = "Search"),
       
-      HTML("</br>"),
-      
+      # select a specific track
       uiOutput("tracks"),
       fluidRow(column(10, verbatimTextOutput("selectedTracksList")))
       
