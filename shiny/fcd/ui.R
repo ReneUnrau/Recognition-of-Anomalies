@@ -3,8 +3,6 @@
 library(shiny)
 library(leaflet)
 
-currentTracksList = list("track1", "track2", "track3") # needs to be created from filter
-
 shinyUI(fluidPage(
   titlePanel("Filter options"),
   
@@ -12,19 +10,25 @@ shinyUI(fluidPage(
     sidebarPanel(
       
       # select dates
-      dateRangeInput("dates", label = "Date range"),
-      fluidRow(column(10, verbatimTextOutput("selectedDates"))),
+      dateRangeInput("dates", label = "Date range", start = as.Date("2015-01-02")),
+      fluidRow(column(12, verbatimTextOutput("selectedDates"))),
+      
+      # select boundingbox
+      checkboxInput("checkbox", label = "Consider current map as boundingbox", value = TRUE),
+      fluidRow(column(12, verbatimTextOutput("boundingBoxText"))),
+      
+      # select limit
+      sliderInput("limit_slider", label = "Select the number of tracks", min = 1, max = 100, value = 2),
+      fluidRow(column(4, verbatimTextOutput("limit"))),
       
       # start the search for tracks
-      actionButton("search", label = "Search"),
+      actionButton("search_btn", label = "Search"),
       
-      # select tracks from search
-      selectInput("tracksList", 
-                  label = "Choose a Track to display",
-                  choices = currentTracksList,
-                  selected = currentTracksList[1]),
-      fluidRow(column(10, verbatimTextOutput("selectedTracksList"))),
-      htmlOutput("boundingBoxText")
+      HTML("</br>"),
+      
+      uiOutput("tracks"),
+      fluidRow(column(10, verbatimTextOutput("selectedTracksList")))
+      
     ),
     
     mainPanel(
@@ -34,8 +38,8 @@ shinyUI(fluidPage(
         #initialTileLayer = NULL,
         #initialTileLayerAttribution = NULL,
         options=list(
-          center = c(40, -98.85),
-          zoom = 4,
+          center = c(51.96, 7.62),
+          zoom = 10,
           maxBounds = list(list(17, -180), list(59, 180))
         )
       )  
