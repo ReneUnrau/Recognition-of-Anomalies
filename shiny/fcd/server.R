@@ -106,10 +106,20 @@ shinyServer(function(input, output, session) {
     if(is.null(input$tracksList))
       return()
     isolate({
-    print("observe currentTrack")
-    # get number from track selection
-    num = get_trackNumber(input$tracksList)
-    currentTrack <<- get_track(trCol, num)
+      print("observe currentTrack")
+      # get number from track selection
+      num = get_trackNumber(input$tracksList)
+      currentTrack <<- get_track(trCol, num)
+      
+      # show track on map
+      coordinates = currentTrack@sp@coords
+      map$clearShapes()
+      for(i in 1:nrow(coordinates)){
+        latitude <- as.numeric((coordinates[i,2]))
+        longitude <- as.numeric((coordinates[i,1]))
+        
+        map$addCircle(latitude, longitude, 5)
+      }
     })
   })
   
