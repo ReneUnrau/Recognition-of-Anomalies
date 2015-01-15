@@ -44,7 +44,12 @@ shinyUI(fluidPage(
           zoom = 10,
           maxBounds = list(list(17, -180), list(59, 180))
         )
-      )  
+      ),
+      br(),
+      h4("Legend"),
+      p(span("Blue dot ", style = "color:blue"), ": Track Measurement"),
+      p(span("Red dot ", style = "color:red"), ": Outlier")
+     
     )
   )
 ))

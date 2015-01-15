@@ -169,7 +169,10 @@ shinyServer(function(input, output, session) {
   
   # output the selected track name:
   output$selectedTracksList = renderText({
-    paste("Selected Track: ", "\n", input$tracksList, "\n first speed: ", currentTrack@connections$speed[1])
+    paste("Selected Track: ", "\n", input$tracksList, "\n First speed: ", "\n", currentTrack@connections$speed[1], "km/h")
   })
+  
+  
+
 
 })
