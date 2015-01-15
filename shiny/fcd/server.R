@@ -3,6 +3,41 @@
 source ("import.R")
 
 # Functions
+findOutliers = function (track, map) {
+  # TO DO -> make function generice, add function to renes drawer function, add checkbox for visualization of anomalies
+  data = track@data$GPS.Accuracy
+  ex_low = c()
+  ex_high = c()
+  
+  # Calculate lower and higher border of whiskers
+  lower_border <- quantile(data, probs=0.25) - (1.5*IQR(data)) #Lower border for extremes
+  upper_border <- quantile(data, probs=0.75) + (1.5*IQR(data)) #Upper border for extremes
+  
+  # Get values of outliers
+  lows <- data[data<lower_border] #High extremes
+  highs <- data[data>upper_border] #Low extremes
+  
+  # Get indices corresponding to those outliers
+  indices_low <- which(data<lower_border)
+  indices_high <- which(data>upper_border)
+  
+  # Merge indices to single array
+  indices <- c(indices_low,indices_high)
+  indices
+  
+  # Draw corresponding points on Map
+  coordinates = track@sp@coords
+  for(i in indices){
+    latitude <- as.numeric((coordinates[i,2]))
+    longitude <- as.numeric((coordinates[i,1]))
+  
+  # REMOVE LOOP AFTER PRESENTATION!!  
+  for (i in 1:10){
+    map$addCircle(latitude, longitude, 5, options = list(color = '#ff0000'))
+    }
+  }
+}
+
 changeTrackSelection = function(){
   # get length of current tracksCollection
   len = length(trCol@tracksCollection)
@@ -120,6 +155,15 @@ shinyServer(function(input, output, session) {
         
         map$addCircle(latitude, longitude, 5)
       }
+    })
+  })
+  
+  # show Anomalies on map
+  observe({
+    if (input$anomalies_btn == 0) 
+      return()
+    isolate({
+      findOutliers(currentTrack, map)
     })
   })
   

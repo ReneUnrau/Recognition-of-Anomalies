@@ -26,7 +26,10 @@ shinyUI(fluidPage(
       
       # select a specific track
       uiOutput("tracks"),
-      fluidRow(column(10, verbatimTextOutput("selectedTracksList")))
+      fluidRow(column(10, verbatimTextOutput("selectedTracksList"))),
+      
+      # start the search for tracks
+      actionButton("anomalies_btn", label = "Show Anomalies")
       
     ),
     
