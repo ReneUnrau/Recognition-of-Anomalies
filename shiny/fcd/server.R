@@ -172,6 +172,10 @@ shinyServer(function(input, output, session) {
     paste("Selected Track: ", "\n", input$tracksList, "\n First speed: ", "\n", currentTrack@connections$speed[1], "km/h")
   })
   
+  # Generate an HTML table view of the data
+  output$table <- renderTable({
+    # show selected track data
+  })
   
 
 

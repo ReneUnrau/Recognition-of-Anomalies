@@ -34,22 +34,28 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
-      leafletMap(
-        "map", "100%", 500,
-        # By default OpenStreetMap tiles are used; we want nothing in this case
-        #initialTileLayer = NULL,
-        #initialTileLayerAttribution = NULL,
-        options=list(
-          center = c(51.96, 7.62),
-          zoom = 10,
-          maxBounds = list(list(17, -180), list(59, 180))
-        )
-      ),
-      br(),
-      h4("Legend"),
-      p(span("Blue dot ", style = "color:blue"), ": Track Measurement"),
-      p(span("Red dot ", style = "color:red"), ": Outlier")
-     
+      tabsetPanel(
+        tabPanel("Map", 
+                   leafletMap(
+                     "map", "100%", 500,
+                     # By default OpenStreetMap tiles are used; we want nothing in this case
+                     #initialTileLayer = NULL,
+                     #initialTileLayerAttribution = NULL,
+                     options=list(
+                       center = c(51.96, 7.62),
+                       zoom = 10,
+                       maxBounds = list(list(17, -180), list(59, 180))
+                     )
+                   ),
+                   br(),
+                   h4("Legend"),
+                   p(span("Blue dot ", style = "color:blue"), ": Track Measurement"),
+                   p(span("Red dot ", style = "color:red"), ": Outlier")
+                 ),
+        tabPanel("Plot", plotOutput("plot")), 
+        tabPanel("Table", tableOutput("table")),
+        tabPanel("Log", verbatimTextOutput("log"))
+      )
     )
   )
 ))
