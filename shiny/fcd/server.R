@@ -3,9 +3,24 @@
 source ("import.R")
 
 # Functions
-findOutliers = function (track, map) {
-  # TO DO -> make function generice, add function to renes drawer function, add checkbox for visualization of anomalies
-  data = track@data$GPS.Accuracy
+findOutliers = function (track, attr, map) {
+  # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
+  data <- switch(attr, 
+                 "Co2" = track@data$Co2,
+                 "Calculated.MAF" = track@data$Calculated.MAF,
+                 "Engine.Load" = track@data$Engine.Load,
+                 "GPS.Accuracy" = track@data$GPS.Accuracy,
+                 "GPS.HDOP" = track@data$GPS.HDOP,
+                 "GPS.PDOP" = track@data$GPS.PDOP,
+                 "GPS.Speed" = track@data$GPS.Speed,
+                 "GPS.VDOP" = track@data$GPS.VDOP,
+                 "Intake.Pressure" = track@data$Intake.Pressure,
+                 "Intake.Temperature" = track@data$Intake.Temperature,
+                 "MAF" = track@data$MAF,
+                 "Rpm" = track@data$Rpm,
+                 "Speed" = track@data$Speed,
+                 "Throttle.Position" = track@data$Throttle.Position)
+  
   ex_low = c()
   ex_high = c()
   
@@ -24,13 +39,25 @@ findOutliers = function (track, map) {
   # Merge indices to single array
   indices <- c(indices_low,indices_high)
   indices
+  print("Number of outliers:")
+  print(length(indices))
+  
+  # show track on map
+  tr_coordinates = track@sp@coords
+  map$clearShapes()
+  for(i in 1:nrow(tr_coordinates)){
+    latitude <- as.numeric((tr_coordinates[i,2]))
+    longitude <- as.numeric((tr_coordinates[i,1]))
+    
+    map$addCircle(latitude, longitude, 5)
+  }  
   
   # Draw corresponding points on Map
   coordinates = track@sp@coords
   for(i in indices){
     latitude <- as.numeric((coordinates[i,2]))
     longitude <- as.numeric((coordinates[i,1]))
-  
+    
   # REMOVE LOOP AFTER PRESENTATION!!  
   for (i in 1:10){
     map$addCircle(latitude, longitude, 5, options = list(color = '#ff0000'))
@@ -87,28 +114,7 @@ shinyServer(function(input, output, session) {
   # create leaflet map
   map = createLeafletMap(session, "map")
   
-  # output selected dates:
-  output$selectedDates = renderText({
-    paste("Dates: \n First date: ", input$dates[1], "\n Second date: ", input$dates[2])
-  })
-  
-  # output the boundingbox:
-  output$boundingBoxText = renderText({
-    if(input$checkbox[1]){
-      TEXT = "Boundingbox:"
-      NE_LAT = paste("NE_LAT", input$map_bounds[1])
-      NE_LON = paste("NE_LON", input$map_bounds[2])
-      SW_LAT = paste("SW_LAT", input$map_bounds[3])
-      SW_LON = paste("SW_LON", input$map_bounds[4])
-      paste(TEXT, "\n", NE_LAT, "\n", NE_LON, "\n", SW_LAT, "\n", SW_LON, "\n")
-    } else {
-      paste("BBox not selected!", "\n")
-    }
-  })
-  
-  # output the selected limit
-  output$limit = renderPrint({ input$limit_slider })
-  
+    
   # change TracksCollection if search button is used
   observe({
     if (input$search_btn == 0) 
@@ -163,7 +169,7 @@ shinyServer(function(input, output, session) {
     if (input$anomalies_btn == 0) 
       return()
     isolate({
-      findOutliers(currentTrack, map)
+      findOutliers(currentTrack, input$anomalies_btn, map)
     })
   })
   

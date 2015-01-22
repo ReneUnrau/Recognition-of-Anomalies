@@ -103,9 +103,25 @@ lines(tr2@sp@coords, type="l", col="blue")
 tr1@connections$speed[1]
 tr2@connections$speed[1]
 
-findOutliers = function (track, map) {
-  # TO DO -> make function generice, add function to renes drawer function, add checkbox for visualization of anomalies
-  data = track@data$GPS.Accuracy
+# Functions
+findOutliers = function (track, attr, map) {
+  # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
+  data <- switch(attr, 
+                 "Co2" = track@data$Co2,
+                 "Calculated.MAF" = track@data$Calculated.MAF,
+                 "Engine.Load" = track@data$Engine.Load,
+                 "GPS.Accuracy" = track@data$GPS.Accuracy,
+                 "GPS.HDOP" = track@data$GPS.HDOP,
+                 "GPS.PDOP" = track@data$GPS.PDOP,
+                 "GPS.Speed" = track@data$GPS.Speed,
+                 "GPS.VDOP" = track@data$GPS.VDOP,
+                 "Intake.Pressure" = track@data$Intake.Pressure,
+                 "Intake.Temperature" = track@data$Intake.Temperature,
+                 "MAF" = track@data$MAF,
+                 "Rpm" = track@data$Rpm,
+                 "Speed" = track@data$Speed,
+                 "Throttle.Position" = track@data$Throttle.Position)
+  
   ex_low = c()
   ex_high = c()
   
@@ -124,6 +140,18 @@ findOutliers = function (track, map) {
   # Merge indices to single array
   indices <- c(indices_low,indices_high)
   indices
+  print("Number of outliers:")
+  print(length(indices))
+  
+  # show track on map
+  tr_coordinates = track@sp@coords
+  map$clearShapes()
+  for(i in 1:nrow(tr_coordinates)){
+    latitude <- as.numeric((tr_coordinates[i,2]))
+    longitude <- as.numeric((tr_coordinates[i,1]))
+    
+    map$addCircle(latitude, longitude, 5)
+  }  
   
   # Draw corresponding points on Map
   coordinates = track@sp@coords
@@ -137,5 +165,4 @@ findOutliers = function (track, map) {
     }
   }
 }
-
-#findOutliers(tr1)
+findOutliers(tr1)

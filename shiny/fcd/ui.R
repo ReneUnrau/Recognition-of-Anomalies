@@ -9,17 +9,21 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       
+      # Data chooser
+      h4("Data Selection"),
+      
+      
       # select dates
       dateRangeInput("dates", label = "Date range", start = as.Date("2015-01-02")),
-      fluidRow(column(12, verbatimTextOutput("selectedDates"))),
+      
       
       # select boundingbox
       checkboxInput("checkbox", label = "Consider current map as boundingbox", value = TRUE),
-      fluidRow(column(12, verbatimTextOutput("boundingBoxText"))),
+      
       
       # select limit
       sliderInput("limit_slider", label = "Select the number of tracks", min = 1, max = 100, value = 2),
-      fluidRow(column(4, verbatimTextOutput("limit"))),
+      
       
       # start the search for tracks
       actionButton("search_btn", label = "Search"),
@@ -27,6 +31,18 @@ shinyUI(fluidPage(
       # select a specific track
       uiOutput("tracks"),
       fluidRow(column(10, verbatimTextOutput("selectedTracksList"))),
+      
+      # Recognition of Anomalies - Analysis
+      br(),
+      h4("Anomaly Analysis"),
+      
+      # Select an attribute which serves as input for the analysis
+      selectInput("attribute_selector", label="Choose an attribute to display",
+                  choices = list("Co2", "Calculated.MAF", "Engine.Load", "GPS.Accuracy",
+                                 "GPS.HDOP", "GPS.PDOP", "GPS.Speed", "GPS.VDOP", 
+                                 "Intake.Pressure", "Intake. Temperature",
+                                 "MAF", "Rpm", "Speed", "Throttle.Position"),
+                  selected = "Percent White"),
       
       # start the search for tracks
       actionButton("anomalies_btn", label = "Show Anomalies")
