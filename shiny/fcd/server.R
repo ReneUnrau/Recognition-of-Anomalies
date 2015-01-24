@@ -106,6 +106,8 @@ ur = c(7.65,52) # upper right: 51.985515, 7.674909
 default_bbox = matrix(c(ll, ur),ncol=2,dimnames=list(c("x","y"),c("min","max")))
 trCol = importEnviroCar(serverUrl = stableURL, bbox = default_bbox, limit = 1)
 
+currentTrack <- 0
+
 # get initial track
 currentTrack = get_track(trCol, 1)
 
@@ -159,7 +161,7 @@ shinyServer(function(input, output, session) {
         latitude <- as.numeric((coordinates[i,2]))
         longitude <- as.numeric((coordinates[i,1]))
         
-        map$addCircle(latitude, longitude, 5)
+        map$addCircle(latitude, longitude, 5, toString(i))
       }
     })
   })
@@ -183,6 +185,32 @@ shinyServer(function(input, output, session) {
     # show selected track data
   })
   
-
-
+  clickObs <- observe({
+    map$clearPopups()
+    event <- input$map_shape_click
+    index <- as.integer(event$id)
+    if (is.null(event))
+      return()
+    
+    isolate({
+      content <- as.character(tagList(
+        tags$h4("Trackelement: ", index),
+        sprintf("CO2: %s", currentTrack@data$CO2[index]), tags$br(),
+        sprintf("Calculated MAF: %s", currentTrack@data$Calculated.MAF[index]), tags$br(),
+        sprintf("Engine Load: %s", currentTrack@data$Engine.Load[index]), tags$br(),
+        sprintf("GPS Accuracy: %s", currentTrack@data$GPS.Accuracy[index]), tags$br(),
+        sprintf("GPS HDOP: %s", currentTrack@data$GPS.HDOP[index]), tags$br(),
+        sprintf("GPS PDOP: %s", currentTrack@data$GPS.PDOP[index]), tags$br(),
+        sprintf("GPS Speed: %s", currentTrack@data$GPS.Speed[index]), tags$br(),
+        sprintf("GPS VDOP: %s", currentTrack@data$GPS.VDOP[index]), tags$br(),
+        sprintf("Intake Pressure: %s", currentTrack@data$Intake.Pressure[index]), tags$br(),
+        sprintf("Intake Temperature: %s", currentTrack@data$Intake.Temperature[index]), tags$br(),
+        sprintf("MAF: %s", currentTrack@data$MAF[index]), tags$br(),
+        sprintf("Rpm: %s", currentTrack@data$Rpm[index]), tags$br(),
+        sprintf("Speed: %s", currentTrack@data$Speed[index]), tags$br(),
+        sprintf("Throttle Position: %s", currentTrack@data$Throttle.Position[index]), tags$br()
+        ))
+      map$showPopup(event$lat, event$lng, content)
+    })
+  })
 })
