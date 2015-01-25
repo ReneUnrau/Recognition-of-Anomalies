@@ -3,6 +3,42 @@
 source ("import.R")
 
 # Functions
+displayNeighborAnomalies = function (track, attr, map) {
+  # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
+  data <- switch(attr, 
+                 "Co2" = track@data$CO2,
+                 "Calculated.MAF" = track@data$Calculated.MAF,
+                 "Engine.Load" = track@data$Engine.Load,
+                 "GPS.Accuracy" = track@data$GPS.Accuracy,
+                 "GPS.HDOP" = track@data$GPS.HDOP,
+                 "GPS.PDOP" = track@data$GPS.PDOP,
+                 "GPS.Speed" = track@data$GPS.Speed,
+                 "GPS.VDOP" = track@data$GPS.VDOP,
+                 "Intake.Pressure" = track@data$Intake.Pressure,
+                 "Intake.Temperature" = track@data$Intake.Temperature,
+                 "MAF" = track@data$MAF,
+                 "Rpm" = track@data$Rpm,
+                 "Speed" = track@data$Speed,
+                 "Throttle.Position" = track@data$Throttle.Position)
+  
+  # first draft: get biggest difference
+  biggestDiff = 0
+  index = 0
+  for(i in 1:(length(data)-1)){
+    diff <- abs(data[i] - data[i+1])
+    if (diff > biggestDiff)
+      biggestDiff = diff
+      index = i
+  }
+  
+  map$clearMarkers()
+  tr_coordinates = track@sp@coords
+  latitude <- as.numeric((tr_coordinates[index,2]))
+  longitude <- as.numeric((tr_coordinates[index,1]))
+  map$addMarker(latitude, longitude, toString(index))
+}
+
+
 findOutliers = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
@@ -188,8 +224,16 @@ shinyServer(function(input, output, session) {
   observe({
     if (input$anomalies_btn == 0) 
       return()
+    
     isolate({
-      findOutliers(currentTrack, input$anomalies_btn, map)
+      chosenMethod <- input$analysis_method
+      print(chosenMethod)
+      if(chosenMethod == "Outliers"){
+        findOutliers(currentTrack, input$anomalies_btn, map)
+        
+      } else if (chosenMethod == "Compare neighbors"){        
+        displayNeighborAnomalies(currentTrack, input$anomalies_btn, map)
+      }
     })
   })
   

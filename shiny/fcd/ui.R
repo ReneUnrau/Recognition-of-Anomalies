@@ -44,6 +44,10 @@ shinyUI(fluidPage(
                                  "MAF", "Rpm", "Speed", "Throttle.Position"),
                   selected = "Percent White"),
       
+      selectInput("analysis_method", label="Choose method for analysis",
+                  choices = list("Outliers", "Compare neighbors"),
+                  selected = "Outliers"),
+      
       # start the search for tracks
       actionButton("anomalies_btn", label = "Show Anomalies")
       
