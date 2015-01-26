@@ -89,6 +89,7 @@ findOutliers = function (track, attr, map) {
   }  
   
   # Draw corresponding measurements as marker on Map
+  map$clearMarkers()
   coordinates = track@sp@coords
   for(i in indices){
     latitude <- as.numeric((coordinates[i,2]))
