@@ -271,4 +271,5 @@ shinyServer(function(input, output, session) {
     content <- getPopUpContent(index)
     map$showPopup(event$lat, event$lng, content)
   })
+  
 })

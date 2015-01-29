@@ -26,7 +26,7 @@ shinyUI(fluidPage(
       
       
       # start the search for tracks
-      actionButton("search_btn", label = "Search"),
+      actionButton("search_btn", label = "Search", icon = icon("search")),
       
       # select a specific track
       uiOutput("tracks"),
@@ -49,7 +49,7 @@ shinyUI(fluidPage(
                   selected = "Outliers"),
       
       # start the search for tracks
-      actionButton("anomalies_btn", label = "Show Anomalies")
+      actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("dot-circle-o"))
       
     ),
     
@@ -67,14 +67,15 @@ shinyUI(fluidPage(
                        maxBounds = list(list(17, -180), list(59, 180))
                      )
                    ),
+                   icon = icon("globe"),
                    br(),
                    h4("Legend"),
-                   p(span("Blue dot ", style = "color:blue"), ": Track Measurement"),
-                   p(span("Red dot ", style = "color:red"), ": Outlier")
+                   p(span("Point ", style = "color:blue"), ": Track Measurement"),
+                   p(span("Marker ", style = "color:blue"), ": Anomaly")
                  ),
-        tabPanel("Plot", plotOutput("plot")), 
-        tabPanel("Table", tableOutput("table")),
-        tabPanel("Log", verbatimTextOutput("log"))
+        tabPanel("Plot", plotOutput("plot"), icon = icon("bar-chart-o")), 
+        tabPanel("Table", dataTableOutput("table"), icon = icon("table")),
+        tabPanel("Log", verbatimTextOutput("log"), icon = icon("code"))
       )
     )
   )
