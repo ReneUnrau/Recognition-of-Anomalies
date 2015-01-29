@@ -272,4 +272,31 @@ shinyServer(function(input, output, session) {
     map$showPopup(event$lat, event$lng, content)
   })
   
+  # Compute the forumla text in a reactive expression since it is 
+  # shared by the output$caption and output$plot expressions
+  formulaText <- reactive({
+    paste("time ~", input$attribute_selector)
+  })
+  
+  # Return the formula text for printing as a caption
+  output$caption <- renderText({
+    formulaText()
+  })
+  
+  # Generate a plot of the requested variable against time
+  output$plot <- renderPlot({
+    boxplot(as.formula(formulaText()), 
+            data = #currentTrack@data@[input$attribute_selector]
+              ,
+            outline = highs)
+  })
+  
+  summaryText <- reactive({
+    summary(currentTrack)
+  })
+  
+  # just the summary of the current track that is displayed
+  output$log <- renderPrint({
+    summaryText()
+  })
 })

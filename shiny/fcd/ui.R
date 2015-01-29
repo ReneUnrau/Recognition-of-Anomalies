@@ -73,8 +73,12 @@ shinyUI(fluidPage(
                    p(span("Point ", style = "color:blue"), ": Track Measurement"),
                    p(span("Marker ", style = "color:blue"), ": Anomaly")
                  ),
-        tabPanel("Plot", plotOutput("plot"), icon = icon("bar-chart-o")), 
-        tabPanel("Table", dataTableOutput("table"), icon = icon("table")),
+        tabPanel("Plot", h3(textOutput("caption")),  
+                 selectInput("graphType", label="Choose a graph type to plot",
+                             choices = list("Boxplot", "Bar", "Line", "Scatter"),
+                             selected = "Boxplot"),
+                 plotOutput("plot"), icon = icon("bar-chart-o") ),
+        tabPanel("Table", tableOutput("table"), icon = icon("table")),
         tabPanel("Log", verbatimTextOutput("log"), icon = icon("code"))
       )
     )
