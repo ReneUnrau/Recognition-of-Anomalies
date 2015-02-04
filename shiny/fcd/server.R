@@ -1,6 +1,7 @@
 # server.R
 
 source ("import.R")
+source ("mapFunctions.R")
 
 # Functions
 displayNeighborAnomalies = function (track, attr, map) {
@@ -31,11 +32,7 @@ displayNeighborAnomalies = function (track, attr, map) {
       index = i
   }
   
-  map$clearMarkers()
-  tr_coordinates = track@sp@coords
-  latitude <- as.numeric((tr_coordinates[index,2]))
-  longitude <- as.numeric((tr_coordinates[index,1]))
-  map$addMarker(latitude, longitude, toString(index))
+  drawMarkers(index, track, map)
 }
 
 
@@ -79,24 +76,10 @@ findOutliers = function (track, attr, map) {
   print(length(indices))
   
   # show track on map
-  tr_coordinates = track@sp@coords
-  map$clearShapes()
-  for(i in 1:nrow(tr_coordinates)){
-    latitude <- as.numeric((tr_coordinates[i,2]))
-    longitude <- as.numeric((tr_coordinates[i,1]))
-    
-    map$addCircle(latitude, longitude, 5, toString(i))
-  }  
+  #drawTrack(track)
   
   # Draw corresponding measurements as marker on Map
-  map$clearMarkers()
-  coordinates = track@sp@coords
-  for(i in indices){
-    latitude <- as.numeric((coordinates[i,2]))
-    longitude <- as.numeric((coordinates[i,1]))
-    
-    map$addMarker(latitude, longitude, toString(i))
-  }
+  drawMarkers(indices, track, map)
 }
 
 changeTrackSelection = function(){
@@ -140,29 +123,6 @@ ur = c(7.65,52) # upper right: 51.985515, 7.674909
 default_bbox = matrix(c(ll, ur),ncol=2,dimnames=list(c("x","y"),c("min","max")))
 trCol = importEnviroCar(serverUrl = stableURL, bbox = default_bbox, limit = 1)
 
-currentTrack <- 0
-
-getPopUpContent <- function(index){
-  content <- as.character(tagList(
-    tags$h4("Trackelement: ", index),
-    sprintf("CO2: %s", currentTrack@data$CO2[index]), tags$br(),
-    sprintf("Calculated MAF: %s", currentTrack@data$Calculated.MAF[index]), tags$br(),
-    sprintf("Engine Load: %s", currentTrack@data$Engine.Load[index]), tags$br(),
-    sprintf("GPS Accuracy: %s", currentTrack@data$GPS.Accuracy[index]), tags$br(),
-    sprintf("GPS HDOP: %s", currentTrack@data$GPS.HDOP[index]), tags$br(),
-    sprintf("GPS PDOP: %s", currentTrack@data$GPS.PDOP[index]), tags$br(),
-    sprintf("GPS Speed: %s", currentTrack@data$GPS.Speed[index]), tags$br(),
-    sprintf("GPS VDOP: %s", currentTrack@data$GPS.VDOP[index]), tags$br(),
-    sprintf("Intake Pressure: %s", currentTrack@data$Intake.Pressure[index]), tags$br(),
-    sprintf("Intake Temperature: %s", currentTrack@data$Intake.Temperature[index]), tags$br(),
-    sprintf("MAF: %s", currentTrack@data$MAF[index]), tags$br(),
-    sprintf("Rpm: %s", currentTrack@data$Rpm[index]), tags$br(),
-    sprintf("Speed: %s", currentTrack@data$Speed[index]), tags$br(),
-    sprintf("Throttle Position: %s", currentTrack@data$Throttle.Position[index]), tags$br()
-  ))
-  content
-}
-
 # get initial track
 currentTrack = get_track(trCol, 1)
 
@@ -204,20 +164,11 @@ shinyServer(function(input, output, session) {
     if(is.null(input$tracksList))
       return()
     isolate({
-      print("observe currentTrack")
-      # get number from track selection
+      # get number from track selection and make object global
       num = get_trackNumber(input$tracksList)
-      currentTrack <<- get_track(trCol, num)
-      
+      currenttrack <- get_track(trCol, num)
       # show track on map
-      coordinates = currentTrack@sp@coords
-      map$clearShapes()
-      for(i in 1:nrow(coordinates)){
-        latitude <- as.numeric((coordinates[i,2]))
-        longitude <- as.numeric((coordinates[i,1]))
-        
-        map$addCircle(latitude, longitude, 5, toString(i))
-      }
+      drawTrack(currenttrack, map)
     })
   })
   
@@ -228,14 +179,43 @@ shinyServer(function(input, output, session) {
     
     isolate({
       chosenMethod <- input$analysis_method
-      print(chosenMethod)
+      # get number from track selection
+      num = get_trackNumber(input$tracksList)
+      #make track object global for popupcontent access
+      currenttrack <- get_track(trCol, num)
       if(chosenMethod == "Outliers"){
-        findOutliers(currentTrack, input$anomalies_btn, map)
+        findOutliers(currenttrack, input$anomalies_btn, map)
         
       } else if (chosenMethod == "Compare neighbors"){        
-        displayNeighborAnomalies(currentTrack, input$anomalies_btn, map)
+        displayNeighborAnomalies(currenttrack, input$anomalies_btn, map)
       }
     })
+  })
+  
+  # handle click event for marker - id is used to access content
+  markerClickObs <- observe({
+    map$clearPopups()
+    event <- input$map_marker_click
+    
+    if (is.null(event)) {
+      return ()
+    }
+    index <- as.integer(event$id)
+    content <- getPopUpContent(index, currentTrack)
+    map$showPopup(event$lat, event$lng, content)
+  })
+  
+  # handle click event for shape - id is used to access content
+  shapeClickObs <- observe({
+    map$clearPopups()
+    event <- input$map_shape_click
+    
+    if (is.null(event)) {
+      return ()
+    }    
+    index <- as.integer(event$id)
+    content <- getPopUpContent(index, currentTrack)
+    map$showPopup(event$lat, event$lng, content)
   })
   
   # output the selected track name:
@@ -246,30 +226,6 @@ shinyServer(function(input, output, session) {
   # Generate an HTML table view of the data
   output$table <- renderTable({
     # show selected track data
-  })
-  
-  markerClickObs <- observe({
-    map$clearPopups()
-    event <- input$map_marker_click
-    
-    if (is.null(event)) {
-      return ()
-    }
-    index <- as.integer(event$id)
-    content <- getPopUpContent(index)
-    map$showPopup(event$lat, event$lng, content)
-  })
-    
-  shapeClickObs <- observe({
-    map$clearPopups()
-    event <- input$map_shape_click
-    
-    if (is.null(event)) {
-      return ()
-    }    
-    index <- as.integer(event$id)
-    content <- getPopUpContent(index)
-    map$showPopup(event$lat, event$lng, content)
   })
   
   # Compute the forumla text in a reactive expression since it is 
