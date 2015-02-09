@@ -39,20 +39,16 @@ shinyServer(function(input, output, session) {
       return()
     isolate({
       time = create_timeinterval_from_input(input$dates[1], input$dates[2])
-      print(paste("time -> ", time))
       limit = input$limit_slider
-      print(paste("limit -> ", limit))
       # just get the bbox if the checkbox is clicked!
       if(input$checkbox[1]){
         bbox = create_bbox_from_input(c(input$map_bounds[4],input$map_bounds[3]), c(input$map_bounds[2],input$map_bounds[1]))
-        print(paste("bbox -> ", bbox))
         trCol <<- importEnviroCar(serverUrl = stableURL, bbox = bbox, timeInterval = time, limit = limit)
       }
       # else do not consider the bbox
       else {
         trCol <<- importEnviroCar(serverUrl = stableURL, timeInterval = time, limit = limit)
       }
-      print("Tracks loaded!")
       # make choosable tracks refering to trackscollection
       output$tracks = renderUI({
         changeTrackSelection()
@@ -117,11 +113,6 @@ shinyServer(function(input, output, session) {
     index <- as.integer(event$id)
     content <- getPopUpContent(index, currentTrack)
     map$showPopup(event$lat, event$lng, content)
-  })
-  
-  # output the selected track name:
-  output$selectedTracksList = renderText({
-    paste("Selected Track: ", "\n", input$tracksList, "\n First speed: ", "\n", currentTrack@connections$speed[1], "km/h")
   })
   
   # Generate an HTML table view of the data

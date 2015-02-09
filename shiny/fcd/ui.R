@@ -30,7 +30,6 @@ shinyUI(fluidPage(
       
       # select a specific track
       uiOutput("tracks"),
-      fluidRow(column(10, verbatimTextOutput("selectedTracksList"))),
       
       # Recognition of Anomalies - Analysis
       br(),
