@@ -81,10 +81,13 @@ shinyServer(function(input, output, session) {
       #make track object global for popupcontent access
       currenttrack <- get_track(trCol, num)
       if(chosenMethod == "Outliers"){
-        findOutliers(currenttrack, input$anomalies_btn, map)
-        
+        findOutliers(currenttrack, input$attribute_selector, map)
+        output$plot <- renderPlot({
+          boxplot(currenttrack@data$Speed, main="Boxplot representing selected attribute for chosen tracl", 
+                xlab=input$attribute_selector, ylab="ylab decrisption")
+        })        
       } else if (chosenMethod == "Compare neighbors"){        
-        displayNeighborAnomalies(currenttrack, input$anomalies_btn, map)
+        displayNeighborAnomalies(currenttrack, input$attribute_selector, map)
       }
     })
   })
@@ -129,14 +132,6 @@ shinyServer(function(input, output, session) {
   # Return the formula text for printing as a caption
   output$caption <- renderText({
     formulaText()
-  })
-  
-  # Generate a plot of the requested variable against time
-  output$plot <- renderPlot({
-    boxplot(as.formula(formulaText()), 
-            data = #currentTrack@data@[input$attribute_selector]
-              ,
-            outline = highs)
   })
   
   summaryText <- reactive({
