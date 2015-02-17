@@ -18,7 +18,7 @@ shinyUI(fluidPage(
       
       
       # select boundingbox
-      checkboxInput("checkbox", label = "Consider current map as boundingbox", value = TRUE),
+      checkboxInput("checkbox_bb", label = "Consider current map as boundingbox", value = TRUE),
       
       
       # select limit
@@ -30,6 +30,9 @@ shinyUI(fluidPage(
       
       # select a specific track
       uiOutput("tracks"),
+      
+      # select traffic signals
+      checkboxInput("checkbox_signals", label = "Show traffic signals in the district of Muenster", value = FALSE),
       
       # Recognition of Anomalies - Analysis
       br(),
@@ -44,7 +47,7 @@ shinyUI(fluidPage(
                   selected = "Percent White"),
       
       selectInput("analysis_method", label="Choose method for analysis",
-                  choices = list("Outliers", "Compare neighbors"),
+                  choices = list("Outliers", "Compare neighbors", "Unexpected stops"),
                   selected = "Outliers"),
       
       # start the search for tracks

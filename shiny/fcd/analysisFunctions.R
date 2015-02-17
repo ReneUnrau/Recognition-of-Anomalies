@@ -1,3 +1,6 @@
+# load sp for traffic signals anomaly
+require (sp)
+
 displayNeighborAnomalies = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
@@ -48,9 +51,6 @@ findOutliers = function (track, attr, map) {
                  "Speed" = track@data$Speed,
                  "Throttle.Position" = track@data$Throttle.Position)
   
-  ex_low = c()
-  ex_high = c()
-  
   # Calculate lower and higher border of whiskers
   lower_border <- quantile(data, probs=0.25) - (1.5*IQR(data)) #Lower border for extremes
   upper_border <- quantile(data, probs=0.75) + (1.5*IQR(data)) #Upper border for extremes
@@ -68,5 +68,30 @@ findOutliers = function (track, attr, map) {
   print("Number of outliers:")
   print(length(indices))
   # Draw corresponding measurements as marker on Map
+  drawMarkers(indices, track, map)
+}
+
+
+#load the traffic signals of the district of Muenster
+traffic_signals = read.csv("traffic_signals.csv", sep = ";")
+coordinates(traffic_signals) = ~x+y
+
+# function to check whether there are unexpected stops that cannot be related to fraffic signals (>50m away)
+findTrafficSignalAnomalies = function (track, map) {
+  # save indices of anomalies
+  indices = c()
+  # check if the speed is equal to 0 at any point (ignoring NA values and first / last point in a track)
+  for(i in 2:length(track)-1)
+    if(track@data$Speed[i] == 0 && !is.na(track@data$Speed[i])){
+      # check the distance to the next traffic signal
+      distToTrafficSignals = spDistsN1(pts = traffic_signals@coords, pt = track@sp@coords[i,], longlat = T)
+      # get the min distance
+      minDist = min(distToTrafficSignals)
+      # check if that distance is > 50m (0.05km)
+      if(minDist > 0.05){
+        # add index to anomalies
+        indices = c(indices, i)
+      }
+    }
   drawMarkers(indices, track, map)
 }

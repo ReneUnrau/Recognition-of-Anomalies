@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
       time = create_timeinterval_from_input(input$dates[1], input$dates[2])
       limit = input$limit_slider
       # just get the bbox if the checkbox is clicked!
-      if(input$checkbox[1]){
+      if(input$checkbox_bb[1]){
         bbox = create_bbox_from_input(c(input$map_bounds[4],input$map_bounds[3]), c(input$map_bounds[2],input$map_bounds[1]))
         trCol <<- importEnviroCar(serverUrl = stableURL, bbox = bbox, timeInterval = time, limit = limit)
       }
@@ -68,10 +68,26 @@ shinyServer(function(input, output, session) {
     isolate({
       # get number from track selection and make object global
       num = get_trackNumber(input$tracksList)
-      currenttrack <- get_track(trCol, num)
+      currentTrack <<- get_track(trCol, num)
       # show track on map
-      drawTrack(currenttrack, map)
+      drawTrack(currentTrack, map)
     })
+  })
+  
+  # show the traffic signals of the district of Muenster if the checkbox is clicked
+  observe({
+    if(input$checkbox_signals[1]){
+      # load the traffic signals as red dots
+      coordinates = traffic_signals@coords
+      for(i in 1:nrow(coordinates)){
+        latitude <- as.numeric((coordinates[i,2]))
+        longitude <- as.numeric((coordinates[i,1]))
+        map$addCircle(latitude, longitude, 5, paste("traffic_signal",i), list(color='#FF0040'))
+      }
+    } else {
+      # delete all circles but add the track again
+      drawTrack(currentTrack, map)
+    }
   })
   
   # show Anomalies on map
@@ -84,15 +100,17 @@ shinyServer(function(input, output, session) {
       # get number from track selection
       num = get_trackNumber(input$tracksList)
       #make track object global for popupcontent access
-      currenttrack <- get_track(trCol, num)
+      currentTrack <<- get_track(trCol, num)
       if(chosenMethod == "Outliers"){
-        findOutliers(currenttrack, input$attribute_selector, map)
+        findOutliers(currentTrack, input$attribute_selector, map)
         output$plot <- renderPlot({
-          boxplot(currenttrack@data$Speed, main="Boxplot representing selected attribute for chosen tracl", 
+          boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen tracl", 
                 xlab=input$attribute_selector, ylab="ylab decrisption")
         })        
       } else if (chosenMethod == "Compare neighbors"){        
-        displayNeighborAnomalies(currenttrack, input$attribute_selector, map)
+        displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+      } else if (chosenMethod == "Unexpected stops"){        
+        findTrafficSignalAnomalies(currentTrack, map)
       }
     })
   })
