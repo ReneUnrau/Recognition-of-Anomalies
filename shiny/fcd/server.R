@@ -33,6 +33,11 @@ shinyServer(function(input, output, session) {
   # create leaflet map
   map = createLeafletMap(session, "map")
   
+  # initially change track selection (default track is added)
+  output$tracks = renderUI({
+    changeTrackSelection()
+  })
+  
   # change TracksCollection if search button is used
   observe({
     if (input$search_btn == 0) 
