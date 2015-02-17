@@ -97,10 +97,6 @@ shinyServer(function(input, output, session) {
     
     isolate({
       chosenMethod <- input$analysis_method
-      # get number from track selection
-      num = get_trackNumber(input$tracksList)
-      #make track object global for popupcontent access
-      currentTrack <<- get_track(trCol, num)
       if(chosenMethod == "Outliers"){
         findOutliers(currentTrack, input$attribute_selector, map)
         output$plot <- renderPlot({
