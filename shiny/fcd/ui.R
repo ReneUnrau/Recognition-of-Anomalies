@@ -4,8 +4,8 @@ library(shiny)
 library(leaflet)
 
 shinyUI(fluidPage(
-  titlePanel("Filter options"),
-  
+  titlePanel("Recognition of Anomalies"),
+
   sidebarLayout(
     sidebarPanel(
       
@@ -40,18 +40,23 @@ shinyUI(fluidPage(
       
       # Select an attribute which serves as input for the analysis
       selectInput("attribute_selector", label="Choose an attribute to display",
-                  choices = list("Co2", "Calculated.MAF", "Engine.Load", "GPS.Accuracy",
-                                 "GPS.HDOP", "GPS.PDOP", "GPS.Speed", "GPS.VDOP", 
-                                 "Intake.Pressure", "Intake. Temperature",
-                                 "MAF", "Rpm", "Speed", "Throttle.Position"),
+                  choices = list("CO2", "Speed", "RPM", "GPS Speed", "GPS Accuracy",
+                                 "GPS HDOP", "GPS PDOP",  "GPS VDOP", 
+                                 "MAF", "Calculated MAF", "Engine Load", "Throttle Position",
+                                 "Intake Pressure", "Intake Temperature"
+                                 ),
                   selected = "Percent White"),
       
       selectInput("analysis_method", label="Choose method for analysis",
-                  choices = list("Outliers", "Compare neighbors", "Unexpected stops"),
+                  choices = list("Outliers", "Compare neighbors", "Unexpected stops", "Car turns"),
                   selected = "Outliers"),
       
       # start the search for tracks
-      actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("dot-circle-o"))
+      actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("dot-circle-o")),
+      
+      # Text field for analysis message
+      br(),
+      htmlOutput("analysis_message")
       
     ),
     
@@ -73,7 +78,8 @@ shinyUI(fluidPage(
                    br(),
                    h4("Legend"),
                    p(span("Point ", style = "color:blue"), ": Track Measurement"),
-                   p(span("Marker ", style = "color:blue"), ": Anomaly")
+                   p(span("Marker ", style = "color:blue"), ": Anomaly"),
+                   p(span("Point ", style = "color:red"), ": Traffic Light")
                  ),
         tabPanel("Plot", h3(textOutput("caption")),  
                  selectInput("graphType", label="Choose a graph type to plot",
@@ -81,7 +87,8 @@ shinyUI(fluidPage(
                              selected = "Boxplot"),
                  plotOutput("plot"), icon = icon("bar-chart-o") ),
         tabPanel("Table", tableOutput("table"), icon = icon("table")),
-        tabPanel("Log", verbatimTextOutput("log"), icon = icon("code"))
+        tabPanel("Log", verbatimTextOutput("log"), icon = icon("code")),
+        tabPanel("Info", textOutput("info_text"), icon = icon("info"))
       )
     )
   )

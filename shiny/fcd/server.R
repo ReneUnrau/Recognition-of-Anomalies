@@ -9,7 +9,7 @@ changeTrackSelection = function(){
   # get length of current tracksCollection
   len = length(trCol@tracksCollection)
   numbers = c(1:len)
-  tracknames = paste("track", numbers)
+  tracknames = paste("Track", numbers)
   # assign tracknames to tracksList
   selectInput("tracksList", 
               label = "Choose a Track to display",
@@ -100,13 +100,19 @@ shinyServer(function(input, output, session) {
       if(chosenMethod == "Outliers"){
         findOutliers(currentTrack, input$attribute_selector, map)
         output$plot <- renderPlot({
-          boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen tracl", 
-                xlab=input$attribute_selector, ylab="ylab decrisption")
-        })        
+          boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen track", 
+                xlab=input$attribute_selector, ylab="ylab description")
+        })
+        output$analysis_message <- renderText({
+          paste(span("Anomalies found: ", style = "color:red"))
+        })
+        
       } else if (chosenMethod == "Compare neighbors"){        
         displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
       } else if (chosenMethod == "Unexpected stops"){        
         findTrafficSignalAnomalies(currentTrack, map)
+      } else if (chosenMethod == "Car turns"){        
+        findTurnAnomalies(currentTrack, map)
       }
     })
   })
@@ -140,6 +146,7 @@ shinyServer(function(input, output, session) {
   # Generate an HTML table view of the data
   output$table <- renderTable({
     # show selected track data
+    
   })
   
   # Compute the forumla text in a reactive expression since it is 

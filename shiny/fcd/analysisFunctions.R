@@ -4,20 +4,20 @@ require (sp)
 displayNeighborAnomalies = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
-                 "Co2" = track@data$CO2,
-                 "Calculated.MAF" = track@data$Calculated.MAF,
-                 "Engine.Load" = track@data$Engine.Load,
-                 "GPS.Accuracy" = track@data$GPS.Accuracy,
-                 "GPS.HDOP" = track@data$GPS.HDOP,
-                 "GPS.PDOP" = track@data$GPS.PDOP,
-                 "GPS.Speed" = track@data$GPS.Speed,
-                 "GPS.VDOP" = track@data$GPS.VDOP,
-                 "Intake.Pressure" = track@data$Intake.Pressure,
-                 "Intake.Temperature" = track@data$Intake.Temperature,
+                 "CO 2" = track@data$CO2,
+                 "Calculated MAF" = track@data$Calculated.MAF,
+                 "Engine Load" = track@data$Engine.Load,
+                 "GPS Accuracy" = track@data$GPS.Accuracy,
+                 "GPS HDOP" = track@data$GPS.HDOP,
+                 "GPS PDOP" = track@data$GPS.PDOP,
+                 "GPS Speed" = track@data$GPS.Speed,
+                 "GPS VDOP" = track@data$GPS.VDOP,
+                 "Intake Pressure" = track@data$Intake.Pressure,
+                 "Intake Temperature" = track@data$Intake.Temperature,
                  "MAF" = track@data$MAF,
-                 "Rpm" = track@data$Rpm,
+                 "RPM" = track@data$Rpm,
                  "Speed" = track@data$Speed,
-                 "Throttle.Position" = track@data$Throttle.Position)
+                 "Throttle Position" = track@data$Throttle.Position)
   
   # first draft: get biggest difference
   biggestDiff = 0
@@ -36,20 +36,20 @@ displayNeighborAnomalies = function (track, attr, map) {
 findOutliers = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
-                 "Co2" = track@data$Co2,
-                 "Calculated.MAF" = track@data$Calculated.MAF,
-                 "Engine.Load" = track@data$Engine.Load,
-                 "GPS.Accuracy" = track@data$GPS.Accuracy,
-                 "GPS.HDOP" = track@data$GPS.HDOP,
-                 "GPS.PDOP" = track@data$GPS.PDOP,
-                 "GPS.Speed" = track@data$GPS.Speed,
-                 "GPS.VDOP" = track@data$GPS.VDOP,
-                 "Intake.Pressure" = track@data$Intake.Pressure,
-                 "Intake.Temperature" = track@data$Intake.Temperature,
+                 "CO2" = track@data$Co2,
+                 "Calculated MAF" = track@data$Calculated.MAF,
+                 "Engine Load" = track@data$Engine.Load,
+                 "GPS Accuracy" = track@data$GPS.Accuracy,
+                 "GPS HDOP" = track@data$GPS.HDOP,
+                 "GPS PDOP" = track@data$GPS.PDOP,
+                 "GPS Speed" = track@data$GPS.Speed,
+                 "GPS VDOP" = track@data$GPS.VDOP,
+                 "Intake Pressure" = track@data$Intake.Pressure,
+                 "Intake Temperature" = track@data$Intake.Temperature,
                  "MAF" = track@data$MAF,
-                 "Rpm" = track@data$Rpm,
+                 "RPM" = track@data$Rpm,
                  "Speed" = track@data$Speed,
-                 "Throttle.Position" = track@data$Throttle.Position)
+                 "Throttle Position" = track@data$Throttle.Position)
   
   # Calculate lower and higher border of whiskers
   lower_border <- quantile(data, probs=0.25) - (1.5*IQR(data)) #Lower border for extremes
@@ -67,6 +67,7 @@ findOutliers = function (track, attr, map) {
   indices <- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
+  
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
 }
@@ -94,4 +95,25 @@ findTrafficSignalAnomalies = function (track, map) {
       }
     }
   drawMarkers(indices, track, map)
+}
+
+# function to check whether there are unexpected car turns (i.e. no normal left/right turns)
+# author: Daniel Sawatzky
+findTurnAnomalies = function (track, map) {
+  
+  # get bearing of car
+  bearing <- track@data$GPS.Bearing
+  
+  # save indices of anomalies
+  indices = c()
+  
+  # check if the bearing difference is greater than 90 deg (ignoring NA values and first / last point in a track)
+  for(i in 2:length(track)-1)
+    bearing_diff = bearing[i] - bearing[i-1]
+    if(bearing_diff > 90 && !is.na(bearing[i])){
+      # add index to anomalies
+      indices = c(indices, i)
+    }
+  drawMarkers(indices, track, map)
+  
 }
