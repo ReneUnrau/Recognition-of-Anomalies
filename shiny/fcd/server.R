@@ -82,7 +82,8 @@ shinyServer(function(input, output, session) {
       for(i in 1:nrow(coordinates)){
         latitude <- as.numeric((coordinates[i,2]))
         longitude <- as.numeric((coordinates[i,1]))
-        map$addCircle(latitude, longitude, 5, paste("traffic_signal",i), list(color='#FF0040'))
+        # start assigning IDs with 10000
+        map$addCircle(latitude, longitude, 5, toString(10000+i), list(color='#FF0040'))
       }
     } else {
       # delete all circles but add the track again
