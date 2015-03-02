@@ -101,19 +101,23 @@ findTrafficSignalAnomalies = function (track, map) {
 # author: Daniel Sawatzky
 findTurnAnomalies = function (track, map) {
   
-  # get bearing of car
+  # get bearing of track
   bearing <- track@data$GPS.Bearing
   
   # save indices of anomalies
   indices = c()
   
-  # check if the bearing difference is greater than 90 deg (ignoring NA values and first / last point in a track)
+  # check if the bearing difference is greater than 90 deg (ignoring NA values and first/last point in a track)
   for(i in 2:length(track)-1)
-    bearing_diff = bearing[i] - bearing[i-1]
+    bearing_diff = abs(bearing[i] - bearing[i+1])
+    print("Bearing Difference: ")
+    print(bearing_diff)
     if(bearing_diff > 90 && !is.na(bearing[i])){
       # add index to anomalies
       indices = c(indices, i)
     }
+  print("Number of unexpected turns:")
+  print(length(indices))
   drawMarkers(indices, track, map)
   
 }

@@ -111,7 +111,7 @@ shinyServer(function(input, output, session) {
         displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
       } else if (chosenMethod == "Unexpected stops"){        
         findTrafficSignalAnomalies(currentTrack, map)
-      } else if (chosenMethod == "Car turns"){        
+      } else if (chosenMethod == "Unexpected car turns"){        
         findTurnAnomalies(currentTrack, map)
       }
     })
@@ -146,7 +146,7 @@ shinyServer(function(input, output, session) {
   # Generate an HTML table view of the data
   output$table <- renderTable({
     # show selected track data
-    
+    # data needs to be in a different format: xtable
   })
   
   # Compute the forumla text in a reactive expression since it is 
@@ -168,4 +168,23 @@ shinyServer(function(input, output, session) {
   output$log <- renderPrint({
     summaryText()
   })
+
+  # information with: a tutorial, list of enviroCar related terms and definitions, used libraries, collaborators
+  output$info_text <- renderText({
+    paste(h3("How-To and FAQ"),
+          p(span("Tutorial", style = "font-weight:bold"), br(), "Coming soon..."),
+          p(span("FAQ ", style = "font-weight:bold"),br(), "Coming soon..."),
+          br(),
+          h3("Definitions"),
+          p(span("MAF", style = "font-weight:bold"), "= Mass Air Flow: the mass flowrate of air entering a fuel-injected internal combustion engine.",
+            br(), "..."),
+          br(),
+          h3("Libraries"),
+          p("Used libraries: https://github.com/jcheng5/leaflet-shiny"),
+          br(),
+          h3("Collaborators"),
+          p("This application was developed by Tobias Brüggentisch, Daniel Sawatzky, Lars Syfuß and René Unrau."))
+  })
+
+  
 })

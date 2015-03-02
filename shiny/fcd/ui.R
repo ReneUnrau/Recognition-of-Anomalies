@@ -48,7 +48,7 @@ shinyUI(fluidPage(
                   selected = "Percent White"),
       
       selectInput("analysis_method", label="Choose method for analysis",
-                  choices = list("Outliers", "Compare neighbors", "Unexpected stops", "Car turns"),
+                  choices = list("Outliers", "Compare neighbors", "Unexpected stops", "Unexpected car turns"),
                   selected = "Outliers"),
       
       # start the search for tracks
@@ -88,7 +88,7 @@ shinyUI(fluidPage(
                  plotOutput("plot"), icon = icon("bar-chart-o") ),
         tabPanel("Table", tableOutput("table"), icon = icon("table")),
         tabPanel("Log", verbatimTextOutput("log"), icon = icon("code")),
-        tabPanel("Info", textOutput("info_text"), icon = icon("info"))
+        tabPanel("Info", htmlOutput("info_text") , icon = icon("info"))
       )
     )
   )
