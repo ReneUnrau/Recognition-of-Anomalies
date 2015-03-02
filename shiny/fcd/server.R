@@ -90,7 +90,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  # show Anomalies on map
+  # show Anomalies on map and display plot
   observe({
     if (input$anomalies_btn == 0) 
       return()
@@ -108,7 +108,13 @@ shinyServer(function(input, output, session) {
         })
         
       } else if (chosenMethod == "Compare neighbors"){        
-        displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+        neighborBoxplot <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+        output$plot <- renderPlot({
+          neighborBoxplot
+        })
+        output$analysis_message <- renderText({
+          paste(span("Anomalies found: ", style = "color:red"))
+        })
       } else if (chosenMethod == "Unexpected stops"){        
         findTrafficSignalAnomalies(currentTrack, map)
       } else if (chosenMethod == "Unexpected car turns"){        

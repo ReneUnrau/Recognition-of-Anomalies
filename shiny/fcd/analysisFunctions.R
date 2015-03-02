@@ -4,7 +4,7 @@ require (sp)
 displayNeighborAnomalies = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
-                 "CO 2" = track@data$CO2,
+                 "CO2" = track@data$CO2,
                  "Calculated MAF" = track@data$Calculated.MAF,
                  "Engine Load" = track@data$Engine.Load,
                  "GPS Accuracy" = track@data$GPS.Accuracy,
@@ -19,17 +19,34 @@ displayNeighborAnomalies = function (track, attr, map) {
                  "Speed" = track@data$Speed,
                  "Throttle Position" = track@data$Throttle.Position)
   
-  # first draft: get biggest difference
-  biggestDiff = 0
-  index = 0
+  # create vector with differences of values between neighbors
+  differences <- vector()
   for(i in 1:(length(data)-1)){
-    diff <- abs(data[i] - data[i+1])
-    if (diff > biggestDiff)
-      biggestDiff = diff
-    index = i
+    differences[length(differences) + 1] <- abs(data[i] - data[i+1])
   }
   
-  drawMarkers(index, track, map)
+  # Calculate lower and higher border of whiskers
+  lower_border <- quantile(differences, probs=0.25) - (1.5*IQR(differences)) #Lower border for extremes
+  upper_border <- quantile(differences, probs=0.75) + (1.5*IQR(differences)) #Upper border for extremes
+  
+  # Get values of outliers
+  lows <- differences[differences<lower_border] #High extremes
+  highs <- differences[differences>upper_border] #Low extremes
+  
+  # Get indices corresponding to those outliers
+  indices_low <- which(differences<lower_border)
+  indices_high <- which(differences>upper_border)
+  
+  # Merge indices to single array
+  indices <- c(indices_low,indices_high)
+  print("Number of outliers:")
+  print(length(indices))
+  
+  # Draw corresponding measurements as marker on Map
+  drawMarkers(indices, track, map)
+  
+  return(boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
+          xlab=attr, ylab="ylab description"))
 }
 
 
