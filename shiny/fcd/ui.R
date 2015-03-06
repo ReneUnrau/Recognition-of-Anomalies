@@ -48,7 +48,7 @@ shinyUI(fluidPage(
                   selected = "Percent White"),
       
       selectInput("analysis_method", label="Choose method for analysis",
-                  choices = list("Outliers", "Compare neighbors", "Unexpected stops", "Unexpected car turns"),
+                  choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", "Unexpected car turns"),
                   selected = "Outliers"),
       
       # start the search for tracks

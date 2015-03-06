@@ -89,6 +89,53 @@ findOutliers = function (track, attr, map) {
   drawMarkers(indices, track, map)
 }
 
+findSpeedAnomalies = function(track,map){
+  
+  #get the speed attribues of the track
+  reg_speed = track@data$Speed
+  gps_speed = track@data$GPS.Speed
+  #con_speed = track@connections$speed[i]
+  
+  #vector for storing the indices
+  indices = c()
+  
+  for (i in 2:length(track)) {
+      
+    # check if values are existing
+      
+    if(!is.na(track@data$Speed[i])){
+      reg = reg_speed[i]
+      gps = gps_speed[i]
+      
+      # expectation value of the parameters
+      exp = mean(c(reg, gps))
+      
+      # variance of the parameters
+      v   = var(c(reg, gps))
+      
+      # upper and lower border for anomalies
+      upper = exp + v
+      lower = exp - v
+      difference = reg - gps
+      print(paste("reg: ", reg))
+      print(paste("gps: ", gps))
+      print(paste("difference: ", reg-gps))
+      print(paste("upper: ", upper))
+      print(paste("lower: ", lower))
+      print(paste("variance: ", v))
+      print(paste("expectation: ", exp))
+      
+      #if (reg > upper || reg < lower || gps > upper || gps < lower) {
+      #  indices = c(indices, i)
+      #}
+      
+      if (difference > 5) {
+        indices = c(indices, i)
+      }
+    }
+  }
+  drawMarkers(indices, track, map)
+}
 
 #load the traffic signals of the district of Muenster
 traffic_signals = read.csv("traffic_signals.csv", sep = ";")

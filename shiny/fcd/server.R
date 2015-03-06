@@ -120,6 +120,8 @@ shinyServer(function(input, output, session) {
         findTrafficSignalAnomalies(currentTrack, map)
       } else if (chosenMethod == "Unexpected car turns"){        
         findTurnAnomalies(currentTrack, map)
+      } else if (chosenMethod == "Speed differences"){
+        findSpeedAnomalies(currentTrack, map)
       }
     })
   })
