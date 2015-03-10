@@ -50,6 +50,10 @@ shinyUI(fluidPage(
       selectInput("analysis_method", label="Choose method for analysis",
                   choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", "Unexpected car turns"),
                   selected = "Outliers"),
+      conditionalPanel(
+        condition = "input.analysis_method == 'Speed differences'",
+        selectInput("difference_selector", "Choose a threshold difference",list(1,2,3,4,5,6,7,8,9,10))
+      ),
       
       # start the search for tracks
       actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("dot-circle-o")),

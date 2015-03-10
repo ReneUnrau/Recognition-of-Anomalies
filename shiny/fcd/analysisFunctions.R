@@ -89,7 +89,7 @@ findOutliers = function (track, attr, map) {
   drawMarkers(indices, track, map)
 }
 
-findSpeedAnomalies = function(track,map){
+findSpeedAnomalies = function(track,map,threshold){
   
   #get the speed attribues of the track
   reg_speed = track@data$Speed
@@ -117,22 +117,18 @@ findSpeedAnomalies = function(track,map){
       upper = exp + v
       lower = exp - v
       difference = reg - gps
-      print(paste("reg: ", reg))
-      print(paste("gps: ", gps))
-      print(paste("difference: ", reg-gps))
-      print(paste("upper: ", upper))
-      print(paste("lower: ", lower))
-      print(paste("variance: ", v))
-      print(paste("expectation: ", exp))
-      
+            
       #if (reg > upper || reg < lower || gps > upper || gps < lower) {
       #  indices = c(indices, i)
       #}
       
-      if (difference > 5) {
+      if (abs(difference) > threshold) {
         indices = c(indices, i)
+        print(paste(abs(difference), " is greater than ", threshold))
       }
+      
     }
+    
   }
   drawMarkers(indices, track, map)
 }
