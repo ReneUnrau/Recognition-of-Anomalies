@@ -2,7 +2,6 @@
 require (sp)
 
 displayNeighborAnomalies = function (track, attr, map) {
-  # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
                  "CO2" = track@data$CO2,
                  "Calculated MAF" = track@data$Calculated.MAF,
@@ -157,7 +156,7 @@ findTrafficSignalAnomalies = function (track, map) {
   drawMarkers(indices, track, map)
 }
 
-# function to check whether there are unexpected car turns (i.e. no normal left/right turns)
+# Analysis function to check whether there are unexpected car turns (i.e. no normal left/right turns)
 # author: Daniel Sawatzky
 findTurnAnomalies = function (track, map) {
   
@@ -179,5 +178,13 @@ findTurnAnomalies = function (track, map) {
   print("Number of unexpected turns:")
   print(length(indices))
   drawMarkers(indices, track, map)
+  
+}
+
+# Analysis function to calculate travel time and compare it to 
+# author: Daniel Sawatzky
+calculateTravelTime = function (track) {
+  
+  
   
 }

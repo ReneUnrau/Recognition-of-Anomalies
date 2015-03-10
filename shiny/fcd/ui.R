@@ -11,10 +11,10 @@ shinyUI(fluidPage(
       
       # Data chooser
       h4("Data Selection"),
-      
+      #icon("calendar"),
       
       # select dates
-      dateRangeInput("dates", label = "Date range", start = as.Date("2015-01-02")),
+      dateRangeInput("dates", label = "Date range", start = as.Date("2015-01-02"), weekstart = 1,),
       
       
       # select boundingbox
@@ -28,38 +28,44 @@ shinyUI(fluidPage(
       # start the search for tracks
       actionButton("search_btn", label = "Search", icon = icon("search")),
       
+      br(), br(),
+      
       # select a specific track
       uiOutput("tracks"),
       
       # select traffic signals
-      checkboxInput("checkbox_signals", label = "Show traffic signals in the district of Muenster", value = FALSE),
+      checkboxInput("checkbox_signals", label = "Show traffic signals", value = FALSE),
       
       # Recognition of Anomalies - Analysis
       br(),
       h4("Anomaly Analysis"),
       
-      # Select an attribute which serves as input for the analysis
-      selectInput("attribute_selector", label="Choose an attribute to display",
-                  choices = list("CO2", "Speed", "RPM", "GPS Speed", "GPS Accuracy",
-                                 "GPS HDOP", "GPS PDOP",  "GPS VDOP", 
-                                 "MAF", "Calculated MAF", "Engine Load", "Throttle Position",
-                                 "Intake Pressure", "Intake Temperature"
-                                 ),
-                  selected = "Percent White"),
-      
       selectInput("analysis_method", label="Choose method for analysis",
-                  choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", "Unexpected car turns"),
+                  choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", 
+                                 "Unexpected car turns", "Traveling time"),
                   selected = "Outliers"),
       conditionalPanel(
         condition = "input.analysis_method == 'Speed differences'",
         selectInput("difference_selector", "Choose a threshold difference",list(1,2,3,4,5,6,7,8,9,10))
       ),
       
+      # Select an attribute which serves as input for the analysis
+      conditionalPanel(
+        condition = "input.analysis_method == 'Outliers' || input.analysis_method == 'Compare neighbors'",
+        selectInput("attribute_selector", label="Choose an attribute to display",
+                    choices = list("CO2", "Speed", "RPM", "GPS Speed", "GPS Accuracy",
+                                   "GPS HDOP", "GPS PDOP",  "GPS VDOP", 
+                                   "MAF", "Calculated MAF", "Engine Load", "Throttle Position",
+                                   "Intake Pressure", "Intake Temperature"
+                    ),
+                    selected = "CO2")
+      ),
+      
       # start the search for tracks
-      actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("dot-circle-o")),
+      actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("bullseye")),
       
       # Text field for analysis message
-      br(),
+      br(),br(),
       htmlOutput("analysis_message")
       
     ),
@@ -79,11 +85,27 @@ shinyUI(fluidPage(
                      )
                    ),
                    icon = icon("globe"),
-                   br(),
-                   h4("Legend"),
-                   p(span("Point ", style = "color:blue"), ": Track Measurement"),
-                   p(span("Marker ", style = "color:blue"), ": Anomaly"),
-                   p(span("Point ", style = "color:red"), ": Traffic Light")
+                   splitLayout(
+                    style = "margin-top: 10px;",
+                    actionButton("showStart_btn", label = "Show start", icon = icon("step-backward")),
+                    actionButton("centerTrack_btn", label = "Center track", icon = icon("compress")),
+                    actionButton("showFinish_btn", label = "Show finish", icon = icon("step-forward"))
+                   ),
+                   flowLayout(
+                    style = "border: 1px solid silver; padding-left: 15px; margin-top: 10px;",
+                    verticalLayout(
+                      h4("Legend"),
+                      splitLayout(
+                        cellWidths = 200,
+                        p(
+                      p(span("Circle ", style = "color:blue"), ": Track Measurement"),
+                      p(span("Marker ", style = "color:blue"), ": Anomaly")),
+                      p(
+                      p(span("Point ", style = "color:#FF0040"), ": Traffic Light"),
+                      p(span("Circle ", style = "color:#00FF91"), ": Start/Finish"))
+                      )
+                    )
+                   )
                  ),
         tabPanel("Plot", h3(textOutput("caption")),  
                  selectInput("graphType", label="Choose a graph type to plot",

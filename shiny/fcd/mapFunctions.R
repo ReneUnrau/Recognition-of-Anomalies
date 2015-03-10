@@ -51,3 +51,43 @@ getPopUpContent <- function(index, track){
   content
 }
 
+# zoom to starting point of track
+zoomToStart = function(track, map){
+  
+  map$clearMarkers()
+  coordinates = track@sp@coords
+  lat <- as.numeric((coordinates[1,2]))
+  lng <- as.numeric((coordinates[1,1]))
+  map$setView(lat, lng, 16, forceReset = FALSE)
+  map$addCircleMarker(lat, lng, 10, toString(1), list(color='#00FF91'))
+  
+}
+
+# zoom to finish point of track
+zoomToFinish = function(track, map){
+  
+  map$clearMarkers()
+  coordinates = track@sp@coords
+  lastMeasurement <- nrow(coordinates)
+  lat <- as.numeric((coordinates[lastMeasurement,2]))
+  lng <- as.numeric((coordinates[lastMeasurement,1]))
+  map$setView(lat, lng, 16, forceReset = FALSE)
+  map$addCircleMarker(lat, lng, 10, toString(lastMeasurement), list(color='#00FF91'))
+  
+}
+
+# center the track
+centerTrack = function(track, map){
+  
+  map$clearMarkers()
+  coordinates = track@sp@coords
+  lastMeasurement <- nrow(coordinates)
+  # lower left coordinate
+  lat_ll <- as.numeric((coordinates[1,2]))
+  lng_ll <- as.numeric((coordinates[1,1]))
+  # upper right: 51.985515, 7.674909
+  lat_ur <- as.numeric((coordinates[lastMeasurement,2]))
+  lng_ur <- as.numeric((coordinates[lastMeasurement,1]))
+  map$fitBounds(lat_ll, lng_ll, lat_ur, lng_ur)
+  
+}
