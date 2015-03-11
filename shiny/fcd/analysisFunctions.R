@@ -68,12 +68,12 @@ findOutliers = function (track, attr, map) {
                  "Throttle Position" = track@data$Throttle.Position)
   
   # Calculate lower and higher border of whiskers
-  lower_border <- quantile(data, probs=0.25) - (1.5*IQR(data)) #Lower border for extremes
-  upper_border <- quantile(data, probs=0.75) + (1.5*IQR(data)) #Upper border for extremes
+  lower_border <- quantile(na.omit(data), probs=0.25, na.rm = TRUE) - (1.5*IQR(data)) #Lower border for extremes
+  upper_border <- quantile(na.omit(data), probs=0.75, na.rm = TRUE) + (1.5*IQR(data)) #Upper border for extremes
   
   # Get values of outliers
   lows <- data[data<lower_border] #High extremes
-  highs <- data[data>upper_border] #Low extremes
+  highs <- data[data>upper_border] #Low extremes?
   
   # Get indices corresponding to those outliers
   indices_low <- which(data<lower_border)
@@ -83,7 +83,7 @@ findOutliers = function (track, attr, map) {
   indices <- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
-  
+    
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
 }
