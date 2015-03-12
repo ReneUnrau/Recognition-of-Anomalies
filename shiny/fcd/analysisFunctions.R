@@ -21,7 +21,11 @@ displayNeighborAnomalies = function (track, attr, map) {
   # create vector with differences of values between neighbors
   differences <- vector()
   for(i in 1:(length(data)-1)){
-    differences[length(differences) + 1] <- abs(data[i] - data[i+1])
+    if(is.na(data[i]) | is.na(data[i+1])) {
+      print("Skip na value")
+    } else {
+      differences[length(differences) + 1] <- abs(data[i] - data[i+1])
+    }
   }
   
   # Calculate lower and higher border of whiskers
