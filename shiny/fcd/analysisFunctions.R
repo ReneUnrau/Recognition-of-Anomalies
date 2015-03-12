@@ -47,9 +47,7 @@ displayNeighborAnomalies = function (track, attr, map) {
   
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
-  
-  return(boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
-          xlab=attr, ylab="ylab description"))
+  return(differences)
 }
 
 

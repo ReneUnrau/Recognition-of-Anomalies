@@ -98,6 +98,7 @@ shinyServer(function(input, output, session) {
     
     isolate({
       chosenMethod <- input$analysis_method
+      print(chosenMethod)
       if(chosenMethod == "Outliers"){
         findOutliers(currentTrack, input$attribute_selector, map)
         output$plot <- renderPlot({
@@ -108,10 +109,11 @@ shinyServer(function(input, output, session) {
           paste(span("Anomalies found: ", style = "color:red"))
         })
         
-      } else if (chosenMethod == "Compare neighbors"){        
-        neighborBoxplot <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+      } else if (chosenMethod == "Compare neighbors"){
+        differences <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
         output$plot <- renderPlot({
-          neighborBoxplot
+          boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
+                  xlab=input$attribute_selector, ylab="ylab description")
         })
         output$analysis_message <- renderText({
           paste(span("Anomalies found: ", style = "color:red"))
