@@ -125,11 +125,13 @@ shinyServer(function(input, output, session) {
           })
           
           } else if (chosenMethod == "Compare neighbors"){        
-            result <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+            differences <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
             output$plot <- renderPlot({
-              result
+              boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
+                      xlab=input$attribute_selector, ylab="ylab description")
             })
-    
+            result <- ""
+            
           } else if (chosenMethod == "Unexpected stops"){        
             result <-  findTrafficSignalAnomalies(currentTrack, map)
           } else if (chosenMethod == "Unexpected car turns"){        
@@ -141,11 +143,12 @@ shinyServer(function(input, output, session) {
           incProgress(0.5)
           
           output$analysis_message <- renderText({
-            if (length(result) == 0){
+            if (length(result) == 0 ){
               paste(span("No anomalies found!", style = "color:red"))
             } else {
               paste(span("Anomalies found: ", style = "color:red"), length(result))
             }
+          
           })
           
           setProgress(1)

@@ -21,7 +21,11 @@ displayNeighborAnomalies = function (track, attr, map) {
   # create vector with differences of values between neighbors
   differences <- vector()
   for(i in 1:(length(data)-1)){
-    differences[length(differences) + 1] <- abs(data[i] - data[i+1])
+    if(is.na(data[i]) | is.na(data[i+1])) {
+      print("Skip na value")
+    } else {
+      differences[length(differences) + 1] <- abs(data[i] - data[i+1])
+    }
   }
   
   # Calculate lower and higher border of whiskers
@@ -43,16 +47,16 @@ displayNeighborAnomalies = function (track, attr, map) {
   
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
-  
-  return(boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
-          xlab=attr, ylab="ylab description"), indices)
+
+  return(differences)
+
 }
 
 
 findOutliers = function (track, attr, map) {
   # TO DO ->add function to renes drawer function, add checkbox for visualization of anomalies
   data <- switch(attr, 
-                 "CO2" = track@data$Co2,
+                 "CO2" = track@data$CO2,
                  "Calculated MAF" = track@data$Calculated.MAF,
                  "Engine Load" = track@data$Engine.Load,
                  "GPS Accuracy" = track@data$GPS.Accuracy,
@@ -67,6 +71,7 @@ findOutliers = function (track, attr, map) {
                  "Speed" = track@data$Speed,
                  "Throttle Position" = track@data$Throttle.Position)
   
+  data <- data[!is.na(data)]
   # Calculate lower and higher border of whiskers
   lower_border <- quantile(na.omit(data), probs=0.25, na.rm = TRUE) - (1.5*IQR(data)) #Lower border for extremes
   upper_border <- quantile(na.omit(data), probs=0.75, na.rm = TRUE) + (1.5*IQR(data)) #Upper border for extremes
