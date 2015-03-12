@@ -4,6 +4,8 @@ source ("analysisFunctions.R")
 source ("mapFunctions.R")
 source ("helperFunctions.R")
 
+library(ggplot2)
+
 #Functions
 changeTrackSelection = function(){
   # get length of current tracksCollection
@@ -38,25 +40,38 @@ shinyServer(function(input, output, session) {
     changeTrackSelection()
   })
   
-  # change TracksCollection if search button is used
+  # change TracksCollection if search button is used. Progressbar indicates the status of loading tracks
   observe({
     if (input$search_btn == 0) 
       return()
-    isolate({
-      time = create_timeinterval_from_input(input$dates[1], input$dates[2])
-      limit = input$limit_slider
-      # just get the bbox if the checkbox is clicked!
-      if(input$checkbox_bb[1]){
-        bbox = create_bbox_from_input(c(input$map_bounds[4],input$map_bounds[3]), c(input$map_bounds[2],input$map_bounds[1]))
-        trCol <<- importEnviroCar(serverUrl = stableURL, bbox = bbox, timeInterval = time, limit = limit)
-      }
-      # else do not consider the bbox
-      else {
-        trCol <<- importEnviroCar(serverUrl = stableURL, timeInterval = time, limit = limit)
-      }
-      # make choosable tracks refering to trackscollection
-      output$tracks = renderUI({
-        changeTrackSelection()
+    withProgress(message = 'Loading...', detail = "Track 1", value = 0, {
+      
+      isolate({
+        time = create_timeinterval_from_input(input$dates[1], input$dates[2])
+        limit = input$limit_slider
+        inc = 1/limit
+
+        for (i in 1:limit) {
+          incProgress(inc, detail = paste("Track", i))
+          
+          # just get the bbox if the checkbox is clicked!
+          if(input$checkbox_bb[1]){
+            bbox = create_bbox_from_input(c(input$map_bounds[4],input$map_bounds[3]), c(input$map_bounds[2],input$map_bounds[1]))
+            trCol <<- importEnviroCar(serverUrl = stableURL, bbox = bbox, timeInterval = time, limit = limit)
+          }
+          # else do not consider the bbox
+          else {
+            trCol <<- importEnviroCar(serverUrl = stableURL, timeInterval = time, limit = limit)
+          }
+          
+        }
+        # make choosable tracks refering to trackscollection
+        output$tracks = renderUI({
+          changeTrackSelection()
+        })
+        
+        setProgress(1)
+        
       })
     })
   })
@@ -77,14 +92,18 @@ shinyServer(function(input, output, session) {
   # show the traffic signals of the district of Muenster if the checkbox is clicked
   observe({
     if(input$checkbox_signals[1]){
-      # load the traffic signals as red dots
-      coordinates = traffic_signals@coords
-      for(i in 1:nrow(coordinates)){
-        latitude <- as.numeric((coordinates[i,2]))
-        longitude <- as.numeric((coordinates[i,1]))
-        # start assigning IDs with 10000
-        map$addCircle(latitude, longitude, 5, toString(10000+i), list(color='#FF0040'))
-      }
+      withProgress(message = 'Displaying traffic signals...', value = 0, {
+        # load the traffic signals as red dots
+        coordinates = traffic_signals@coords
+        for(i in 1:nrow(coordinates)){
+          latitude <- as.numeric((coordinates[i,2]))
+          longitude <- as.numeric((coordinates[i,1]))
+          # start assigning IDs with 10000
+          map$addCircle(latitude, longitude, 5, toString(10000+i), list(color='#FF0040'))
+          incProgress(0.05)
+        }
+        setProgress(1)
+      })
     } else {
       # delete all circles but add the track again
       drawTrack(currentTrack, map)
@@ -95,36 +114,42 @@ shinyServer(function(input, output, session) {
   observe({
     if (input$anomalies_btn == 0) 
       return()
+    withProgress(message = 'Finding anomalies...', value = 0, {
+      isolate({
+        chosenMethod <- input$analysis_method
+        if(chosenMethod == "Outliers"){
+          result <- findOutliers(currentTrack, input$attribute_selector, map)
+          output$plot <- renderPlot({
+            boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen track", 
+                    xlab=input$attribute_selector, ylab="ylab description")
+          })
+          
+          } else if (chosenMethod == "Compare neighbors"){        
+            result <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+            output$plot <- renderPlot({
+              result
+            })
     
-    isolate({
-      chosenMethod <- input$analysis_method
-      if(chosenMethod == "Outliers"){
-        findOutliers(currentTrack, input$attribute_selector, map)
-        output$plot <- renderPlot({
-          boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen track", 
-                xlab=input$attribute_selector, ylab="ylab description")
+          } else if (chosenMethod == "Unexpected stops"){        
+            result <-  findTrafficSignalAnomalies(currentTrack, map)
+          } else if (chosenMethod == "Unexpected car turns"){        
+            result <-  findTurnAnomalies(currentTrack, map)
+          } else if (chosenMethod == "Speed differences"){
+            result <-  findSpeedAnomalies(currentTrack, map, input$difference_selector)
+          }
+          
+          incProgress(0.5)
+          
+          output$analysis_message <- renderText({
+            if (length(result) == 0){
+              paste(span("No anomalies found!", style = "color:red"))
+            } else {
+              paste(span("Anomalies found: ", style = "color:red"), length(result))
+            }
+          })
+          
+          setProgress(1)
         })
-        output$analysis_message <- renderText({
-          paste(span("Anomalies found: ", style = "color:red"))
-        })
-        
-      } else if (chosenMethod == "Compare neighbors"){        
-        neighborBoxplot <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
-        output$plot <- renderPlot({
-          neighborBoxplot
-        })
-        output$analysis_message <- renderText({
-          paste(span("Anomalies found: ", style = "color:red"))
-        })
-      } else if (chosenMethod == "Unexpected stops"){        
-        findTrafficSignalAnomalies(currentTrack, map)
-      } else if (chosenMethod == "Unexpected car turns"){        
-        findTurnAnomalies(currentTrack, map)
-      } else if (chosenMethod == "Speed differences"){
-        findSpeedAnomalies(currentTrack, map, input$difference_selector)
-      } else if (chosenMethod == "Traveling time"){
-        calculateTravelTime(currentTrack)
-      }
     })
   })
   
@@ -155,9 +180,11 @@ shinyServer(function(input, output, session) {
   })
   
   # Generate an HTML table view of the data
-  output$table <- renderTable({
+  output$table <- renderDataTable({
     # show selected track data
-    # data needs to be in a different format: xtable
+    data <- mpg
+    
+    data
   })
   
   # Compute the forumla text in a reactive expression since it is 
@@ -202,7 +229,7 @@ shinyServer(function(input, output, session) {
           ),
           br(),
           h3("Libraries"),
-          p("Leaflet bindings for Shiny: ", a(href="https://github.com/jcheng5/leaflet-shiny", "https://github.com/jcheng5/leaflet-shiny")),
+          p("Leaflet bindings for Shiny: ", a(href="https://github.com/jcheng5/leaflet-shiny", "https://github.com/jcheng5/leaflet-shiny"), br(), "Package sp"),
           br(),
           h3("Developers"),
           p("This application was developed by Tobias Brüggentisch, Daniel Sawatzky, Lars Syfuß and René Unrau."))
@@ -234,4 +261,15 @@ shinyServer(function(input, output, session) {
       centerTrack(currentTrack, map)
     })
   })
+  
+  # image2 sends pre-rendered images
+  output$logo <- renderImage({
+      return(list(
+        src = "www/enviroCarLogo.png",
+        contentType = "image/png",
+        alt = "Logo",
+        height = 100
+      ))  
+    
+  }, deleteFile = FALSE)
 })

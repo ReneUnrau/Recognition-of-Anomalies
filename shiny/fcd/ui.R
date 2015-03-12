@@ -2,9 +2,14 @@
 
 library(shiny)
 library(leaflet)
+library(shinythemes)
 
-shinyUI(fluidPage(
-  titlePanel("Recognition of Anomalies"),
+shinyUI(fluidPage( 
+
+  #theme = "bootstrap.css",
+  includeCSS("www/styles.css"),
+  
+  headerPanel("Recognition of Anomalies"),
 
   sidebarLayout(
     sidebarPanel(
@@ -27,7 +32,6 @@ shinyUI(fluidPage(
       
       # start the search for tracks
       actionButton("search_btn", label = "Search", icon = icon("search")),
-      
       br(), br(),
       
       # select a specific track
@@ -42,7 +46,7 @@ shinyUI(fluidPage(
       
       selectInput("analysis_method", label="Choose method for analysis",
                   choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", 
-                                 "Unexpected car turns", "Traveling time"),
+                                 "Unexpected car turns"),
                   selected = "Outliers"),
       conditionalPanel(
         condition = "input.analysis_method == 'Speed differences'",
@@ -86,13 +90,14 @@ shinyUI(fluidPage(
                    ),
                    icon = icon("globe"),
                    splitLayout(
-                    style = "margin-top: 10px;",
+                    cellWidths = c("auto", "auto", "auto"),
+                    style = "margin-top: 10px; padding-bottom: 10px",
                     actionButton("showStart_btn", label = "Show start", icon = icon("step-backward")),
                     actionButton("centerTrack_btn", label = "Center track", icon = icon("compress")),
                     actionButton("showFinish_btn", label = "Show finish", icon = icon("step-forward"))
                    ),
                    flowLayout(
-                    style = "border: 1px solid silver; padding-left: 15px; margin-top: 10px;",
+                    style = "border: 1px solid silver; padding-left: 15px;",
                     verticalLayout(
                       h4("Legend"),
                       splitLayout(
@@ -101,7 +106,7 @@ shinyUI(fluidPage(
                       p(span("Circle ", style = "color:blue"), ": Track Measurement"),
                       p(span("Marker ", style = "color:blue"), ": Anomaly")),
                       p(
-                      p(span("Point ", style = "color:#FF0040"), ": Traffic Light"),
+                      p(span("Circle ", style = "color:#FF0040"), ": Traffic Light"),
                       p(span("Circle ", style = "color:#00FF91"), ": Start/Finish"))
                       )
                     )
@@ -112,9 +117,9 @@ shinyUI(fluidPage(
                              choices = list("Boxplot", "Bar", "Line", "Scatter"),
                              selected = "Boxplot"),
                  plotOutput("plot"), icon = icon("bar-chart-o") ),
-        tabPanel("Table", tableOutput("table"), icon = icon("table")),
+        tabPanel("Table", dataTableOutput(outputId="table"), icon = icon("table")),
         tabPanel("Log", verbatimTextOutput("log"), icon = icon("code")),
-        tabPanel("Info", htmlOutput("info_text") , icon = icon("info"))
+        tabPanel("Info", imageOutput("logo", height = 100), htmlOutput("info_text") , icon = icon("info"))
       )
     )
   )

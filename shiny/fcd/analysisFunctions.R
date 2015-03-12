@@ -45,7 +45,7 @@ displayNeighborAnomalies = function (track, attr, map) {
   drawMarkers(indices, track, map)
   
   return(boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
-          xlab=attr, ylab="ylab description"))
+          xlab=attr, ylab="ylab description"), indices)
 }
 
 
@@ -86,6 +86,8 @@ findOutliers = function (track, attr, map) {
     
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
+  
+  return(indices)
 }
 
 findSpeedAnomalies = function(track,map,threshold){
@@ -130,6 +132,7 @@ findSpeedAnomalies = function(track,map,threshold){
     
   }
   drawMarkers(indices, track, map)
+  return(indices)
 }
 
 #load the traffic signals of the district of Muenster
@@ -154,6 +157,7 @@ findTrafficSignalAnomalies = function (track, map) {
       }
     }
   drawMarkers(indices, track, map)
+  return(indices)
 }
 
 # Analysis function to check whether there are unexpected car turns (i.e. no normal left/right turns)
@@ -178,13 +182,6 @@ findTurnAnomalies = function (track, map) {
   print("Number of unexpected turns:")
   print(length(indices))
   drawMarkers(indices, track, map)
-  
-}
-
-# Analysis function to calculate travel time and compare it to 
-# author: Daniel Sawatzky
-calculateTravelTime = function (track) {
-  
-  
+  return(indices)
   
 }
