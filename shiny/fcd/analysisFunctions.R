@@ -92,7 +92,7 @@ findOutliers = function (track, attr, map) {
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
   
-  return(indices)
+  return(data)
 }
 
 findSpeedAnomalies = function(track,map,threshold){

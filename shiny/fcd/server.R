@@ -120,7 +120,7 @@ shinyServer(function(input, output, session) {
         if(chosenMethod == "Outliers"){
           result <- findOutliers(currentTrack, input$attribute_selector, map)
           output$plot <- renderPlot({
-            boxplot(currentTrack@data$Speed, main="Boxplot representing selected attribute for chosen track", 
+            boxplot(result, main="Boxplot representing selected attribute for chosen track", 
                     xlab=input$attribute_selector, ylab="ylab description")
           })
           
@@ -227,7 +227,7 @@ shinyServer(function(input, output, session) {
             br(),
             span("GPS VDOP", style = "font-weight:bold"), "= Vertical Dilution of Precision: Measure of accuracy in 1-D position (height). Range from 1 (ideal) to > 20 (poor)", 
             br(),
-            span("GPS PDOP", style = "font-weight:bold"), "= Position Dilution of Precision: Measure of accuracy in 3-D position, also called spherical DOP. Range from 1 (ideal) to > 20 (poor)", 
+            span("GPS PDOP", style = "font-weighft:bold"), "= Position Dilution of Precision: Measure of accuracy in 3-D position, also called spherical DOP. Range from 1 (ideal) to > 20 (poor)", 
             br(), "..."
           ),
           br(),
