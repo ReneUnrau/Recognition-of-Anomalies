@@ -50,7 +50,7 @@ shinyUI(fluidPage(
                   selected = "Outliers"),
       conditionalPanel(
         condition = "input.analysis_method == 'Speed differences'",
-        selectInput("difference_selector", "Choose a threshold difference",list(1,2,3,4,5,6,7,8,9,10))
+        selectInput("difference_selector", "Choose a threshold difference",list(1,2,3,4,5,6,7,8,9))
       ),
       
       # Select an attribute which serves as input for the analysis
