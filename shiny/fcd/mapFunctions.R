@@ -31,21 +31,21 @@ getPopUpContent <- function(index, track){
   } else {
     content <- as.character(tagList(
       tags$h4("Trackelement: ", index),
-      sprintf("CO2: %s", track@data$CO2[index]), tags$br(),
-      sprintf("Speed: %s", track@data$Speed[index]), tags$br(),
-      sprintf("RPM: %s", track@data$Rpm[index]), tags$br(),
-      sprintf("GPS Speed: %s", track@data$GPS.Speed[index]), tags$br(),
-      sprintf("GPS Accuracy: %s", track@data$GPS.Accuracy[index]), tags$br(),
-      sprintf("GPS Bearing: %s", track@data$GPS.Bearing[index]), tags$br(),
-      sprintf("GPS HDOP: %s", track@data$GPS.HDOP[index]), tags$br(),
-      sprintf("GPS PDOP: %s", track@data$GPS.PDOP[index]), tags$br(),
-      sprintf("GPS VDOP: %s", track@data$GPS.VDOP[index]), tags$br(),
-      sprintf("MAF: %s", track@data$MAF[index]), tags$br(),
-      sprintf("Calculated MAF: %s", track@data$Calculated.MAF[index]), tags$br(),
-      sprintf("Engine Load: %s", track@data$Engine.Load[index]), tags$br(),
-      sprintf("Throttle Position: %s", track@data$Throttle.Position[index]), tags$br(),
-      sprintf("Intake Pressure: %s", track@data$Intake.Pressure[index]), tags$br(),
-      sprintf("Intake Temperature: %s", track@data$Intake.Temperature[index]), tags$br()
+      paste("CO2: ", track@data$CO2[index], "g/s"), tags$br(),
+      paste("Speed: ", track@data$Speed[index], "km/h"), tags$br(),
+      paste("RPM: ", track@data$Rpm[index], "u/min"), tags$br(),
+      paste("GPS Speed: ", track@data$GPS.Speed[index], "km/h"), tags$br(),
+      paste("GPS Accuracy: ", track@data$GPS.Accuracy[index], "m"), tags$br(),
+      paste("GPS Bearing: ", track@data$GPS.Bearing[index], "°"), tags$br(),
+      paste("GPS HDOP: ", track@data$GPS.HDOP[index]), tags$br(),
+      paste("GPS PDOP: ", track@data$GPS.PDOP[index]), tags$br(),
+      paste("GPS VDOP: ", track@data$GPS.VDOP[index]), tags$br(),
+      paste("MAF: ", track@data$MAF[index], "l/s"), tags$br(),
+      paste("Calculated MAF: ", track@data$Calculated.MAF[index], "g/s"), tags$br(),
+      paste("Engine Load: ", track@data$Engine.Load[index], "%"), tags$br(),
+      paste("Throttle Position: ", track@data$Throttle.Position[index], "V"), tags$br(),
+      paste("Intake Pressure: ", track@data$Intake.Pressure[index], "kPa"), tags$br(),
+      paste("Intake Temperature: ", track@data$Intake.Temperature[index], "C"), tags$br()
     ))
   }
   content
