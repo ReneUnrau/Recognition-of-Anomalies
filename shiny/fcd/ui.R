@@ -112,10 +112,8 @@ shinyUI(fluidPage(
                     )
                    )
                  ),
-        tabPanel("Plot", h3(textOutput("caption")),  
-                 selectInput("graphType", label="Choose a graph type to plot",
-                             choices = list("Boxplot", "Bar", "Line", "Scatter"),
-                             selected = "Boxplot"),
+        tabPanel("Plot", h3(textOutput("caption")),
+                 p("Boxplots for \"Outliers-\" and \"Compare neighbors-\" analysis will be displayed automatically."),
                  plotOutput("plot"), icon = icon("bar-chart-o") ),
         tabPanel("Table", dataTableOutput(outputId="table"), icon = icon("table")),
         tabPanel("Log", verbatimTextOutput("log"), icon = icon("code")),
