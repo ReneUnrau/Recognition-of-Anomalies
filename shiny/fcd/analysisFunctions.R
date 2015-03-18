@@ -41,7 +41,7 @@ displayNeighborAnomalies = function (track, attr, map) {
   indices_high <- which(differences>upper_border)
   
   # Merge indices to single array
-  indices <- c(indices_low,indices_high)
+  indices <-- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
   
@@ -85,10 +85,10 @@ findOutliers = function (track, attr, map) {
   indices_high <- which(data>upper_border)
   
   # Merge indices to single array
-  indices <- c(indices_low,indices_high)
+  indices <-- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
-    
+
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
   
@@ -167,7 +167,7 @@ findTrafficSignalAnomalies = function (track, map) {
 
 # Analysis function to check whether there are unexpected car turns (i.e. no normal left/right turns)
 # author: Daniel Sawatzky
-findTurnAnomalies = function (track, map) {
+findTurnAnomalies = function (track, map, angle) {
   
   # get bearing of track
   bearing <- track@data$GPS.Bearing
@@ -180,7 +180,7 @@ findTurnAnomalies = function (track, map) {
     bearing_diff = abs(bearing[i] - bearing[i+1])
     print("Bearing Difference: ")
     print(bearing_diff)
-    if(bearing_diff > 90 && !is.na(bearing[i])){
+    if(bearing_diff > angle && !is.na(bearing[i])){
       # add index to anomalies
       indices = c(indices, i)
     }

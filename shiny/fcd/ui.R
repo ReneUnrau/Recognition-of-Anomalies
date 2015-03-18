@@ -46,11 +46,16 @@ shinyUI(fluidPage(
       
       selectInput("analysis_method", label="Choose method for analysis",
                   choices = list("Outliers", "Speed differences", "Compare neighbors", "Unexpected stops", 
-                                 "Unexpected car turns"),
+                                 "Unexpected turns"),
                   selected = "Outliers"),
       conditionalPanel(
         condition = "input.analysis_method == 'Speed differences'",
         selectInput("difference_selector", "Choose a threshold difference",list(1,2,3,4,5,6,7,8,9))
+      ),
+      
+      conditionalPanel(
+        condition = "input.analysis_method == 'Unexpected turns'",
+        sliderInput("bearing_slider", label = "Choose a minimum angle difference", min = 0, max = 360, value = 90)
       ),
       
       # Select an attribute which serves as input for the analysis
@@ -63,7 +68,7 @@ shinyUI(fluidPage(
                                    "Intake Pressure", "Intake Temperature"
                     ),
                     selected = "CO2")
-      ),
+      ),     
       
       # start the search for tracks
       actionButton("anomalies_btn", label = "Show Anomalies", icon = icon("bullseye")),
@@ -115,9 +120,9 @@ shinyUI(fluidPage(
         tabPanel("Plot", h3(textOutput("caption")),
                  p("Boxplots for \"Outliers-\" and \"Compare neighbors-\" analysis will be displayed automatically."),
                  plotOutput("plot"), icon = icon("bar-chart-o") ),
-        tabPanel("Table", dataTableOutput(outputId="table"), icon = icon("table")),
+        #tabPanel("Table", dataTableOutput(outputId="table"), icon = icon("table")),
         tabPanel("Log", verbatimTextOutput("log"), icon = icon("code")),
-        tabPanel("Info", imageOutput("logo", height = 100), htmlOutput("info_text") , icon = icon("info"))
+        tabPanel("Info", htmlOutput("info_text") , icon = icon("info"))
       )
     )
   )

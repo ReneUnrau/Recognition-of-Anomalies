@@ -4,8 +4,6 @@ source ("analysisFunctions.R")
 source ("mapFunctions.R")
 source ("helperFunctions.R")
 
-library(ggplot2)
-
 #Functions
 changeTrackSelection = function(){
   # get length of current tracksCollection
@@ -118,39 +116,43 @@ shinyServer(function(input, output, session) {
       isolate({
         chosenMethod <- input$analysis_method
         if(chosenMethod == "Outliers"){
-          result <- findOutliers(currentTrack, input$attribute_selector, map)
+          outliers <- findOutliers(currentTrack, input$attribute_selector, map)
           output$plot <- renderPlot({
-            boxplot(result, main="Boxplot representing selected attribute for chosen track", 
-                    xlab=input$attribute_selector, ylab="ylab description")
+            boxplot(outliers, main="Boxplot representing selected attribute for chosen track", 
+                    xlab=input$attribute_selector, ylab="Unit")
           })
+          #result <- indices
+          result <- "unknown"
           
           } else if (chosenMethod == "Compare neighbors"){        
             differences <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
             output$plot <- renderPlot({
               boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
-                      xlab=input$attribute_selector, ylab="ylab description")
+                      xlab=input$attribute_selector, ylab="Unit")
             })
-            result <- ""
+            #result <- indices
+            result <- "unknown"
             
           } else if (chosenMethod == "Unexpected stops"){        
             result <-  findTrafficSignalAnomalies(currentTrack, map)
-          } else if (chosenMethod == "Unexpected car turns"){        
-            result <-  findTurnAnomalies(currentTrack, map)
+          } else if (chosenMethod == "Unexpected turns"){        
+            result <-  findTurnAnomalies(currentTrack, map, input$bearing_slider)
           } else if (chosenMethod == "Speed differences"){
             result <-  findSpeedAnomalies(currentTrack, map, input$difference_selector)
           }
           
+          # increment the progress to 50 percent
           incProgress(0.5)
           
           output$analysis_message <- renderText({
-            if (length(result) == 0 ){
+            if (length(result) == 0){
               paste(span("No anomalies found!", style = "color:red"))
             } else {
               paste(span("Anomalies found: ", style = "color:red"), length(result))
             }
           
           })
-          
+          # finished progress
           setProgress(1)
         })
     })
@@ -185,15 +187,14 @@ shinyServer(function(input, output, session) {
   # Generate an HTML table view of the data
   output$table <- renderDataTable({
     # show selected track data
-    data <- mpg
-    
-    data
+    #data <- mpg
+    #data
   })
   
   # Compute the forumla text in a reactive expression since it is 
   # shared by the output$caption and output$plot expressions
   formulaText <- reactive({
-    paste("time ~", input$attribute_selector)
+    paste("Plot for attribute: ", input$attribute_selector)
   })
   
   # Return the formula text for printing as a caption
@@ -213,9 +214,10 @@ shinyServer(function(input, output, session) {
   # information with: a tutorial, list of enviroCar related terms and definitions, used libraries, collaborators
   output$info_text <- renderText({
     paste(h3("How-To and FAQ"),
-          p(span("Tutorial", style = "font-weight:bold"), br(), "Coming soon..."),
+          p(span("Tutorial", style = "font-weight:bold"), br(), "On the left-hand side you can find a sidebar. Under 'Data Selection' you can define a time range. Furthermore, you can select the number of tracks to load (many tracks will decrease the performance!). Click on the 'Search'-Button to load the tracks. Then, you can select which track to display on the map.", br(), "Now, you can start to find anomalies. Choose one of the following analysis methods: "),
+          tags$ul(tags$li(span("Outliers: ", style = "font-style:italic"), "This method compares the values of a specific parameter for a given track. Values that are unusually high or low compared to the other ones are identified and considered as outliers."), tags$li(span("Speed Differences: ", style = "font-style:italic"), "This method compares the different speed attributes of a track and highlights the corresponding points on the map, if the difference is greater than a threshold value."), tags$li(span("Compare Neighbours: ", style = "font-style:italic"), "This method looks at the differences between the values of two neighbor measurements (regarding the track, forward facing) for the chosen attribute."),  tags$li(span("Unexpected Stops: ", style = "font-style:italic"),"This method identifies all measurements where the speed is equal to 0 and a traffic signal is 50 or more meters away. Check 'Show traffic signals' to display them as a red dot."), tags$li(span("Unexpected Turns: ", style = "font-style:italic"),"This method is similar to the unexpected stop analysis and finds car turns. The difference angle between two measurements can be set with the slider. By default the method finds the position where the car turned more than 90\u00B0.")),
+          p(span("A plot view is available under the tab next to 'Map'. We currently provide boxplots only for the 'Outliers'- and 'Compare Neighbours'-Analysis.", br(), "The Log shows more information about the track data.")),
           p(span("FAQ ", style = "font-weight:bold"), br(), "Where can I get this project? You can find the source code on", icon("github"), "GitHub: ", a(href="https://github.com/ReneU/Recognition-of-Anomalies", "https://github.com/ReneU/Recognition-of-Anomalies") ),
-          br(),
           h3("Definitions"),
           p(span("CO2", style = "font-weight:bold"), "= Carbon dioxide: The emission of CO2 is measured in kg/h",
             br(), 
@@ -227,15 +229,12 @@ shinyServer(function(input, output, session) {
             br(),
             span("GPS VDOP", style = "font-weight:bold"), "= Vertical Dilution of Precision: Measure of accuracy in 1-D position (height). Range from 1 (ideal) to > 20 (poor)", 
             br(),
-            span("GPS PDOP", style = "font-weighft:bold"), "= Position Dilution of Precision: Measure of accuracy in 3-D position, also called spherical DOP. Range from 1 (ideal) to > 20 (poor)", 
-            br(), "..."
+            span("GPS PDOP", style = "font-weight:bold"), "= Position Dilution of Precision: Measure of accuracy in 3-D position, also called spherical DOP. Range from 1 (ideal) to > 20 (poor)"
           ),
-          br(),
           h3("Libraries"),
-          p("Leaflet bindings for Shiny: ", a(href="https://github.com/jcheng5/leaflet-shiny", "https://github.com/jcheng5/leaflet-shiny"), br(), "Package sp"),
-          br(),
+          tags$ul(tags$li("Leaflet bindings for Shiny: ", a(href="https://github.com/jcheng5/leaflet-shiny", "https://github.com/jcheng5/leaflet-shiny")), tags$li("R package sp"), tags$li("enviroCar API: ", a(href="https://www.envirocar.org", "https://www.envirocar.org"), br(), imageOutput("logo", height = 100))),
           h3("Developers"),
-          p("This application was developed by Tobias Brüggentisch, Daniel Sawatzky, Lars Syfuß and René Unrau."))
+          p("This application was developed by Tobias Brüggentisch, Daniel Sawatzky, Lars Syfuß and René Unrau.", br(),br(), "Institute for Geoinformatics (ifgi)", br(), "University of Münster", br(), "\u00A9 2015"))
   })
   
   # Center map at first measurement

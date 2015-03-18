@@ -31,12 +31,13 @@ getPopUpContent <- function(index, track){
   } else {
     content <- as.character(tagList(
       tags$h4("Trackelement: ", index),
-      paste("CO2: ", track@data$CO2[index], "g/s"), tags$br(),
+      paste("CO2: ", track@data$CO2[index], "kg/h"), tags$br(),
       paste("Speed: ", track@data$Speed[index], "km/h"), tags$br(),
       paste("RPM: ", track@data$Rpm[index], "u/min"), tags$br(),
+      paste("Consumption: ", track@data$Consumption[index], "l/h"), tags$br(),
       paste("GPS Speed: ", track@data$GPS.Speed[index], "km/h"), tags$br(),
-      paste("GPS Accuracy: ", track@data$GPS.Accuracy[index], "m"), tags$br(),
-      paste("GPS Bearing: ", track@data$GPS.Bearing[index], "°"), tags$br(),
+      paste("GPS Accuracy: ", track@data$GPS.Accuracy[index], "%"), tags$br(),
+      paste("GPS Bearing: ", track@data$GPS.Bearing[index], "\u00B0"), tags$br(),
       paste("GPS HDOP: ", track@data$GPS.HDOP[index]), tags$br(),
       paste("GPS PDOP: ", track@data$GPS.PDOP[index]), tags$br(),
       paste("GPS VDOP: ", track@data$GPS.VDOP[index]), tags$br(),
@@ -45,7 +46,7 @@ getPopUpContent <- function(index, track){
       paste("Engine Load: ", track@data$Engine.Load[index], "%"), tags$br(),
       paste("Throttle Position: ", track@data$Throttle.Position[index], "V"), tags$br(),
       paste("Intake Pressure: ", track@data$Intake.Pressure[index], "kPa"), tags$br(),
-      paste("Intake Temperature: ", track@data$Intake.Temperature[index], "C"), tags$br()
+      paste("Intake Temperature: ", track@data$Intake.Temperature[index], "\u00B0C"), tags$br()
     ))
   }
   content
