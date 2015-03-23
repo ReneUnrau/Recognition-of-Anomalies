@@ -273,4 +273,18 @@ shinyServer(function(input, output, session) {
       ))  
     
   }, deleteFile = FALSE)
+  
+  
+  observe({
+    if (input$reset_btn == 0) 
+      return()
+    map$clearMarkers()
+    output$analysis_message <- renderText({
+     
+        paste(span(""))
+      
+    })
+    
+  })
+  
 })

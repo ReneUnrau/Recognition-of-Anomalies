@@ -99,7 +99,8 @@ shinyUI(fluidPage(
                     style = "margin-top: 10px; padding-bottom: 10px",
                     actionButton("showStart_btn", label = "Show start", icon = icon("step-backward")),
                     actionButton("centerTrack_btn", label = "Center track", icon = icon("compress")),
-                    actionButton("showFinish_btn", label = "Show finish", icon = icon("step-forward"))
+                    actionButton("showFinish_btn", label = "Show finish", icon = icon("step-forward")),
+                    actionButton("reset_btn", label = "Reset marker", icon = icon("times"))
                    ),
                    flowLayout(
                     style = "border: 1px solid silver; padding-left: 15px;",
