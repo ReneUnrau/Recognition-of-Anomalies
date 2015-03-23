@@ -48,7 +48,7 @@ displayNeighborAnomalies = function (track, attr, map) {
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
 
-  return(differences)
+  return(list(difference = differences, indices = indices))
 
 }
 
@@ -92,7 +92,7 @@ findOutliers = function (track, attr, map) {
   # Draw corresponding measurements as marker on Map
   drawMarkers(indices, track, map)
   
-  return(data)
+  return(list(data = data, indices = indices))
 }
 
 findSpeedAnomalies = function(track,map,threshold){

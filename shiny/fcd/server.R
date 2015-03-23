@@ -118,20 +118,19 @@ shinyServer(function(input, output, session) {
         if(chosenMethod == "Outliers"){
           outliers <- findOutliers(currentTrack, input$attribute_selector, map)
           output$plot <- renderPlot({
-            boxplot(outliers, main="Boxplot representing selected attribute for chosen track", 
+            boxplot(outliers["data"], main="Boxplot representing selected attribute for chosen track", 
                     xlab=input$attribute_selector, ylab="Unit")
           })
           #result <- indices
-          result <- "unknown"
+          result <- outliers[["indices"]]
           
           } else if (chosenMethod == "Compare neighbors"){        
-            differences <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
+            analysisResult <- displayNeighborAnomalies(currentTrack, input$attribute_selector, map)
             output$plot <- renderPlot({
-              boxplot(differences, main="Selected attribute differences between neighbors for chosen track", 
+              boxplot(analysisResult["differences"], main="Selected attribute differences between neighbors for chosen track", 
                       xlab=input$attribute_selector, ylab="Unit")
             })
-            #result <- indices
-            result <- "unknown"
+            result <- analysisResult[["indices"]]
             
           } else if (chosenMethod == "Unexpected stops"){        
             result <-  findTrafficSignalAnomalies(currentTrack, map)
