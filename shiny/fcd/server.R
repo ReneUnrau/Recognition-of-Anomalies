@@ -279,6 +279,7 @@ shinyServer(function(input, output, session) {
     if (input$reset_btn == 0) 
       return()
     map$clearMarkers()
+    map$clearPopups()
     output$analysis_message <- renderText({
      
         paste(span(""))

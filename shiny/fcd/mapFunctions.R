@@ -80,7 +80,6 @@ zoomToFinish = function(track, map){
 # center the track
 centerTrack = function(track, map){
   
-  map$clearMarkers()
   coordinates = track@sp@coords
   lastMeasurement <- nrow(coordinates)
   # lower left coordinate
