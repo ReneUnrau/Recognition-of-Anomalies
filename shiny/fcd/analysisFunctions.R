@@ -41,7 +41,7 @@ displayNeighborAnomalies = function (track, attr, map) {
   indices_high <- which(differences>upper_border)
   
   # Merge indices to single array
-  indices <-- c(indices_low,indices_high)
+  indices <- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
   
@@ -85,7 +85,7 @@ findOutliers = function (track, attr, map) {
   indices_high <- which(data>upper_border)
   
   # Merge indices to single array
-  indices <-- c(indices_low,indices_high)
+  indices <- c(indices_low,indices_high)
   print("Number of outliers:")
   print(length(indices))
 
